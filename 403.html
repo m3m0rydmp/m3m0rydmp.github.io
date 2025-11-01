@@ -7,13 +7,15 @@
       // Redirect to the React app's 403 page
       var pathname = window.location.pathname;
       
-      // Store the path for reference
-      sessionStorage.setItem('redirectedFrom403', pathname);
+      // Store the error state so React can display it (no URL parameters)
+      sessionStorage.setItem('errorState', JSON.stringify({
+        code: 403,
+        redirectedFrom: pathname,
+        timestamp: Date.now()
+      }));
       
-      // Redirect to home with a query parameter to trigger error page
-      window.location.replace(
-        window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/') + '/?403=' + encodeURIComponent(pathname)
-      );
+      // Redirect to home without query parameters
+      window.location.replace(window.location.origin + '/');
     </script>
   </head>
   <body>
