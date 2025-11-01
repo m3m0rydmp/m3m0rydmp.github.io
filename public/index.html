@@ -24,7 +24,16 @@
         var redirect = sessionStorage.redirect;
         delete sessionStorage.redirect;
         if (redirect && redirect !== location.href) {
-          history.replaceState(null, null, redirect);
+          // Validate redirect is on same origin before applying
+          try {
+            var url = new URL(redirect, location.origin);
+            if (url.origin === location.origin) {
+              history.replaceState(null, null, redirect);
+            }
+          } catch (e) {
+            // Invalid URL, ignore
+            console.error('Invalid redirect URL');
+          }
         }
       })();
     </script>
@@ -37,8 +46,11 @@
       (function() {
         if (location.hash.startsWith('#/')) {
           var path = location.hash.slice(1);
-          sessionStorage.redirect = location.pathname + path;
-          history.replaceState(null, null, path);
+          // Validate path doesn't contain malicious patterns
+          if (path && !/[<>"']/.test(path) && !path.includes('javascript:')) {
+            sessionStorage.redirect = location.pathname + path;
+            history.replaceState(null, null, path);
+          }
         }
       })();
     </script>

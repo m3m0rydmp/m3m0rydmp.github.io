@@ -12,6 +12,8 @@
 .hero-content {
   flex: 1;
   z-index: 2;
+  overflow: visible;
+  padding-left: 10px; /* Prevent text clipping on left side */
 }
 
 .glitch {
@@ -27,6 +29,8 @@
     -2px 2px 0 var(--primary-magenta),
     2px -2px 0 var(--primary-purple);
   animation: glitch-effect 0.3s infinite;
+  display: inline-block;
+  padding: 0 5px; /* Add padding to prevent clipping */
 }
 
 .subtitle {
