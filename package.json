@@ -1,7 +1,7 @@
 {
   "name": "m3m0rydmp-portfolio",
   "version": "1.0.0",
-  "description": "Cyberpunk-themed cybersecurity portfolio and writeup showcase",
+  "description": "Cyberpunk-themed writeup showcase",
   "homepage": "https://m3m0rydmp.github.io",
   "private": true,
   "dependencies": {
