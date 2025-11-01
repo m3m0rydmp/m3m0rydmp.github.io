@@ -48,7 +48,6 @@ export const config = {
   hero: {
     mainTitle: "m3m0rydmp",
     subtitle: "System Online",
-    subtitleAnimated: "Exploring the digital frontier...",
     primaryButtonText: "ACCESS WRITEUPS",
     secondaryButtonText: "LEARN MORE"
   },
