@@ -4,21 +4,15 @@
     <meta charset="utf-8">
     <title>Access Forbidden</title>
     <script>
-      // Store the 403 redirect path
-      sessionStorage.setItem('pathRedirect', JSON.stringify({
-        path: window.location.pathname,
-        query: window.location.search,
-        hash: window.location.hash,
-        code: 403,
-        timestamp: Date.now()
-      }));
+      // GitHub Pages SPA redirect for 403
+      // Redirect to /403 route in the React app
+      location.replace(
+        location.origin + '/#/403'
+      );
     </script>
-    <!-- Immediate redirect to index.html with special marker -->
-    <meta http-equiv="refresh" content="0;URL='/#403'">
   </head>
   <body>
-    <script>
-      document.write(Array(512).join('&nbsp;'));
-    </script>
+    <!-- IE requires 512+ bytes: https://stackoverflow.com/q/34212265 -->
+    <script>document.write(Array(512).join('&nbsp;'))</script>
   </body>
 </html>
