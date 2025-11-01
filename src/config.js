@@ -8,8 +8,12 @@
 export const config = {
   // ========== SITE METADATA ==========
   siteName: "m3m0rydmp",
-  tagline: "Exploring the digital frontier...",
-  description: "Cybersecurity writeups | CTF solutions | Technical explorations",
+  taglines: [
+    "Pwning machines one at a time...",
+    "powershell -nop -W hidden -noni -ep bypass",
+    "You don't have to learn everything, just keep going..."
+  ],
+  description: "Writeups | Labs | Explorations",
   
   // ========== PROFILE INFORMATION ==========
   profile: {

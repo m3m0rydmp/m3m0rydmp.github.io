@@ -4,27 +4,38 @@ import './Hero.css';
 
 function Hero() {
   const [displayText, setDisplayText] = useState('');
+  const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
   const [matrixChars, setMatrixChars] = useState([]);
-  const fullText = config.hero.subtitleAnimated;
+  const taglines = config.taglines || [config.tagline || ''];
+  const currentTagline = taglines[currentTaglineIndex];
 
   // ASCII characters for Matrix rain effect
   const asciiChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
 
   useEffect(() => {
     let index = 0;
-    const interval = setInterval(() => {
-      if (index < fullText.length) {
-        setDisplayText(fullText.substring(0, index + 1));
-        index++;
-      } else {
-        index = 0;
-        setDisplayText('');
-      }
-    }, 50);
+    let charIndex = 0;
+    const typingSpeed = 50; // ms per character
+    const displayDuration = 2000; // ms to show complete text
+    const delayBetweenLines = 500; // ms delay before next tagline
 
-    return () => clearInterval(interval);
+    const type = () => {
+      if (charIndex < currentTagline.length) {
+        setDisplayText(currentTagline.substring(0, charIndex + 1));
+        charIndex++;
+        setTimeout(type, typingSpeed);
+      } else {
+        // Text fully typed, wait then move to next tagline
+        setTimeout(() => {
+          setDisplayText('');
+          setCurrentTaglineIndex((prev) => (prev + 1) % taglines.length);
+        }, displayDuration + delayBetweenLines);
+      }
+    };
+
+    type();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullText]);
+  }, [currentTagline, taglines]);
 
   useEffect(() => {
     const generateMatrixChar = () => {
