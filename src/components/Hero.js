@@ -63,8 +63,8 @@ function Hero() {
     const element = document.getElementById(targetId);
     if (element) {
       const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      const elementPosition = element.offsetTop; // Use offsetTop for consistent behavior
+      const offsetPosition = elementPosition - headerOffset;
 
       window.scrollTo({
         top: offsetPosition,

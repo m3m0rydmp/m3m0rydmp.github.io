@@ -41,8 +41,8 @@ function Header({ activeSection, setActiveSection }) {
       const element = document.getElementById(targetId);
       if (element) {
         const headerOffset = 80; // Height of fixed header
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        const elementPosition = element.offsetTop; // Use offsetTop instead of getBoundingClientRect
+        const offsetPosition = elementPosition - headerOffset;
 
         window.scrollTo({
           top: offsetPosition,

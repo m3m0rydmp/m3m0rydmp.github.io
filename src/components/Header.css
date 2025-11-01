@@ -122,6 +122,7 @@
     background-color: rgba(10, 14, 39, 0.98);
     gap: 0;
     border-bottom: 2px solid var(--border-glow);
+    z-index: 99;
   }
 
   .nav-links.active {
@@ -131,6 +132,8 @@
   .nav-link {
     padding: var(--spacing-md);
     border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+    width: 100%;
+    text-align: left;
   }
 
   .hamburger {
