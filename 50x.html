@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Server Error</title>
+    <script>
+      // Redirect to the React app's 50x page
+      var pathname = window.location.pathname;
+      
+      // Store the error state so React can display it (no URL parameters)
+      sessionStorage.setItem('errorState', JSON.stringify({
+        code: 500,
+        redirectedFrom: pathname,
+        timestamp: Date.now()
+      }));
+      
+      // Redirect to home without query parameters
+      window.location.replace(window.location.origin + '/');
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to error page...</p>
+  </body>
+</html>
