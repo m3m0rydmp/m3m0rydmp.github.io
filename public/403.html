@@ -4,21 +4,21 @@
     <meta charset="utf-8">
     <title>Access Forbidden</title>
     <script>
-      // Redirect to the React app's 403 page
-      var pathname = window.location.pathname;
-      
-      // Store the error state so React can display it (no URL parameters)
-      sessionStorage.setItem('errorState', JSON.stringify({
+      // Store the 403 redirect path
+      sessionStorage.setItem('pathRedirect', JSON.stringify({
+        path: window.location.pathname,
+        query: window.location.search,
+        hash: window.location.hash,
         code: 403,
-        redirectedFrom: pathname,
         timestamp: Date.now()
       }));
-      
-      // Redirect to home without query parameters
-      window.location.replace(window.location.origin + '/');
     </script>
+    <!-- Immediate redirect to index.html with special marker -->
+    <meta http-equiv="refresh" content="0;URL='/#403'">
   </head>
   <body>
-    <p>Redirecting to error page...</p>
+    <script>
+      document.write(Array(512).join('&nbsp;'));
+    </script>
   </body>
 </html>

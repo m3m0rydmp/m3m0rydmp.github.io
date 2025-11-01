@@ -15,9 +15,30 @@
     <link rel="canonical" href="https://m3m0rydmp.github.io" />
     <link rel="icon" href="/icons/title_icon.jpg" type="image/jpeg" />
     <title>m3m0rydmp - Cybersecurity Portfolio</title>
+    <script>
+      // GitHub Pages SPA redirect handler
+      // Converts the hash path back to a real URL for React Router
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script>
+      // Handle GitHub Pages redirect from 404.html
+      (function() {
+        if (location.hash.startsWith('#/')) {
+          var path = location.hash.slice(1);
+          sessionStorage.redirect = location.pathname + path;
+          history.replaceState(null, null, path);
+        }
+      })();
+    </script>
   </body>
 </html>

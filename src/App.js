@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Writeups from './components/Writeups';
@@ -8,46 +9,8 @@ import Footer from './components/Footer';
 import ErrorPage from './components/ErrorPage';
 import './App.css';
 
-function App() {
-  const [activeSection, setActiveSection] = useState('home');
-  const [errorCode, setErrorCode] = useState(null);
-
-  useEffect(() => {
-    // Check URL for error page routes (/404, /403, /50x)
-    const path = window.location.pathname;
-    
-    // Check sessionStorage for error state (set by 404.html/403.html)
-    const errorState = sessionStorage.getItem('errorState');
-    if (errorState) {
-      try {
-        const error = JSON.parse(errorState);
-        // Only set error if it's recent (within last 5 seconds)
-        if (Date.now() - error.timestamp < 5000) {
-          setErrorCode(error.code);
-          // Clear after reading
-          sessionStorage.removeItem('errorState');
-          return;
-        }
-      } catch (e) {
-        console.error('Error parsing errorState:', e);
-      }
-    }
-    
-    // Fallback: Check URL path for direct error routes
-    if (path === '/404') {
-      setErrorCode(404);
-    } else if (path === '/403') {
-      setErrorCode(403);
-    } else if (path === '/50x') {
-      setErrorCode(500);
-    }
-  }, []);
-
-  // Show error page if error code is set
-  if (errorCode) {
-    return <ErrorPage statusCode={errorCode} />;
-  }
-
+// Main home page component
+function HomePage({ activeSection, setActiveSection }) {
   return (
     <div className="terminal-frame">
       <Header activeSection={activeSection} setActiveSection={setActiveSection} />
@@ -59,6 +22,30 @@ function App() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  const [activeSection, setActiveSection] = useState('home');
+
+  return (
+    <Router>
+      <Routes>
+        {/* Main home page */}
+        <Route 
+          path="/" 
+          element={<HomePage activeSection={activeSection} setActiveSection={setActiveSection} />} 
+        />
+        
+        {/* Error pages */}
+        <Route path="/404" element={<ErrorPage statusCode={404} />} />
+        <Route path="/403" element={<ErrorPage statusCode={403} />} />
+        <Route path="/50x" element={<ErrorPage statusCode={500} />} />
+        
+        {/* Catch all other routes and show 404 */}
+        <Route path="*" element={<ErrorPage statusCode={404} />} />
+      </Routes>
+    </Router>
   );
 }
 
