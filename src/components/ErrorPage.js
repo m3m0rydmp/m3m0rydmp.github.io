@@ -11,7 +11,7 @@ const ErrorPage = ({ statusCode = 404 }) => {
     },
     404: {
       title: '404 NOT FOUND',
-      message: 'Idk, something\'s missing...',
+      message: 'Idk, something\'s missing... But if you contact the dev and add the missing page, a 100% chance he won\'t bother',
       image: '/images/404.jpeg',
       alt: 'Page Not Found'
     },

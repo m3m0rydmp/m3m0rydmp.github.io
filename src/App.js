@@ -40,7 +40,9 @@ function App() {
         {/* Error pages */}
         <Route path="/404" element={<ErrorPage statusCode={404} />} />
         <Route path="/403" element={<ErrorPage statusCode={403} />} />
-        <Route path="/50x" element={<ErrorPage statusCode={500} />} />
+        <Route path="/500" element={<ErrorPage statusCode={500} />} />
+        <Route path="/502" element={<ErrorPage statusCode={500} />} />
+        <Route path="/503" element={<ErrorPage statusCode={500} />} />
         
         {/* Catch all other routes and show 404 */}
         <Route path="*" element={<ErrorPage statusCode={404} />} />
