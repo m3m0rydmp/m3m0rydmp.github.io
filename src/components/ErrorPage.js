@@ -18,7 +18,7 @@ const ErrorPage = ({ statusCode = 404 }) => {
     500: {
       title: '50X SERVER ERROR',
       message: 'Something\'s wrong but I\'ll get it fixed once I\'m out of this mimic',
-      image: '/images/50x.jpeg',
+      image: '/images/500.jpeg',
       alt: 'Server Error'
     }
   };
