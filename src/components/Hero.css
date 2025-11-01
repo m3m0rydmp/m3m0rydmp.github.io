@@ -196,7 +196,14 @@
   }
 
   .hero-profile {
-    display: none;
+    height: 350px;
+    width: 100%;
+    margin-top: var(--spacing-lg);
+  }
+
+  .profile-picture-container {
+    width: 200px;
+    height: 200px;
   }
 
   .hero-content {
@@ -215,6 +222,15 @@
 @media (max-width: 480px) {
   .glitch {
     font-size: clamp(1.2rem, 5vw, 2rem);
+  }
+
+  .hero-profile {
+    height: 300px;
+  }
+
+  .profile-picture-container {
+    width: 180px;
+    height: 180px;
   }
 
   .cta-buttons {
