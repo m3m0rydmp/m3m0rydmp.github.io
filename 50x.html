@@ -4,21 +4,15 @@
     <meta charset="utf-8">
     <title>Server Error</title>
     <script>
-      // Store the 50x redirect path
-      sessionStorage.setItem('pathRedirect', JSON.stringify({
-        path: window.location.pathname,
-        query: window.location.search,
-        hash: window.location.hash,
-        code: 500,
-        timestamp: Date.now()
-      }));
+      // GitHub Pages SPA redirect for 50x
+      // Redirect to /50x route in the React app
+      location.replace(
+        location.origin + '/#/50x'
+      );
     </script>
-    <!-- Immediate redirect to index.html with special marker -->
-    <meta http-equiv="refresh" content="0;URL='/#50x'">
   </head>
   <body>
-    <script>
-      document.write(Array(512).join('&nbsp;'));
-    </script>
+    <!-- IE requires 512+ bytes: https://stackoverflow.com/q/34212265 -->
+    <script>document.write(Array(512).join('&nbsp;'))</script>
   </body>
 </html>
