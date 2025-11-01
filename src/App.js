@@ -15,13 +15,30 @@ function App() {
   useEffect(() => {
     // Check URL for error page routes (/404, /403, /50x)
     const path = window.location.pathname;
-    const params = new URLSearchParams(window.location.search);
     
-    if (path === '/404' || params.has('404')) {
+    // Check sessionStorage for error state (set by 404.html/403.html)
+    const errorState = sessionStorage.getItem('errorState');
+    if (errorState) {
+      try {
+        const error = JSON.parse(errorState);
+        // Only set error if it's recent (within last 5 seconds)
+        if (Date.now() - error.timestamp < 5000) {
+          setErrorCode(error.code);
+          // Clear after reading
+          sessionStorage.removeItem('errorState');
+          return;
+        }
+      } catch (e) {
+        console.error('Error parsing errorState:', e);
+      }
+    }
+    
+    // Fallback: Check URL path for direct error routes
+    if (path === '/404') {
       setErrorCode(404);
-    } else if (path === '/403' || params.has('403')) {
+    } else if (path === '/403') {
       setErrorCode(403);
-    } else if (path === '/50x' || params.has('50x')) {
+    } else if (path === '/50x') {
       setErrorCode(500);
     }
   }, []);
