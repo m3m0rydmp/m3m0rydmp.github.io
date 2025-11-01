@@ -9,12 +9,13 @@ function Header({ activeSection, setActiveSection }) {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['home', 'writeups', 'projects', 'about'];
-      const scrollPosition = window.scrollY + 80; // Match header offset
+      const scrollPosition = window.scrollY + 100; // Slightly lower threshold for detection
 
       for (const sectionId of sections) {
         const element = document.getElementById(sectionId);
         if (element) {
           const { offsetTop, offsetHeight } = element;
+          // Check if section is in viewport considering the header offset
           if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
             setActiveSection(sectionId);
             break;
