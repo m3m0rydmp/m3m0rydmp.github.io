@@ -1,0 +1,35 @@
+/* App Layout */
+
+.terminal-frame {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+section {
+  padding: var(--spacing-xl) 0;
+  border-top: 1px solid rgba(0, 240, 255, 0.1);
+}
+
+section:first-of-type {
+  border-top: none;
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 0 var(--spacing-md);
+  }
+
+  section {
+    padding: var(--spacing-lg) 0;
+  }
+}

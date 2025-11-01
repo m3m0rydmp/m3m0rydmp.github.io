@@ -1,0 +1,224 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-xl) 0;
+  position: relative;
+  overflow: hidden;
+  gap: var(--spacing-xl);
+}
+
+.hero-content {
+  flex: 1;
+  z-index: 2;
+}
+
+.glitch {
+  font-size: clamp(2rem, 10vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 3px;
+  margin-bottom: var(--spacing-md);
+  position: relative;
+  line-height: 1.1;
+  color: var(--primary-cyan);
+  text-shadow: 
+    0 0 10px var(--primary-cyan),
+    -2px 2px 0 var(--primary-magenta),
+    2px -2px 0 var(--primary-purple);
+  animation: glitch-effect 0.3s infinite;
+}
+
+.subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--primary-cyan);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.cursor {
+  width: 2px;
+  height: 1.2em;
+  background-color: var(--primary-cyan);
+  animation: cursor-blink 1s infinite;
+}
+
+.description {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.cta-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+/* Profile Picture Styling */
+.hero-profile {
+  flex: 1;
+  position: relative;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-picture-container {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.profile-picture {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 3px solid var(--primary-cyan);
+  border-radius: 8px;
+  box-shadow: 
+    0 0 20px rgba(84, 193, 230, 0.3),
+    inset 0 0 20px rgba(84, 193, 230, 0.1);
+  transition: all var(--transition-normal);
+}
+
+.profile-picture-container:hover .profile-picture {
+  box-shadow: 
+    0 0 30px rgba(84, 193, 230, 0.5),
+    inset 0 0 30px rgba(84, 193, 230, 0.2),
+    -2px 2px 0 var(--primary-magenta),
+    2px -2px 0 var(--primary-purple);
+  transform: scale(1.02);
+}
+
+.grid-lines {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(0deg, transparent 24%, rgba(84, 193, 230, 0.05) 25%, rgba(84, 193, 230, 0.05) 26%, transparent 27%, transparent 74%, rgba(84, 193, 230, 0.05) 75%, rgba(84, 193, 230, 0.05) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(84, 193, 230, 0.05) 25%, rgba(84, 193, 230, 0.05) 26%, transparent 27%, transparent 74%, rgba(84, 193, 230, 0.05) 75%, rgba(84, 193, 230, 0.05) 76%, transparent 77%, transparent);
+  background-size: 50px 50px;
+  animation: grid-move 20s linear infinite;
+}
+
+.floating-text {
+  position: absolute;
+  right: -50px;
+  bottom: 20%;
+  font-size: var(--font-size-2xl);
+  color: var(--accent-green);
+  letter-spacing: 3px;
+  opacity: 0.3;
+  animation: float 6s ease-in-out infinite;
+  text-shadow: 0 0 15px var(--accent-green);
+}
+
+/* Matrix Rain Effect */
+.matrix-rain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.matrix-char {
+  position: absolute;
+  top: -20px;
+  color: var(--accent-green);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 0.9rem;
+  opacity: 0.6;
+  text-shadow: 0 0 10px var(--accent-green);
+  animation: matrix-fall var(--duration, 3s) linear var(--delay, 0s) forwards;
+  white-space: nowrap;
+  letter-spacing: 2px;
+}
+
+@keyframes matrix-fall {
+  0% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(500px);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    min-height: auto;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-profile {
+    height: 400px;
+  }
+
+  .profile-picture-container {
+    width: 240px;
+    height: 240px;
+  }
+
+  .cta-buttons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    padding: var(--spacing-lg) 0;
+  }
+
+  .glitch {
+    font-size: clamp(1.5rem, 8vw, 3rem);
+  }
+
+  .hero-profile {
+    display: none;
+  }
+
+  .hero-content {
+    text-align: center;
+  }
+
+  .cta-buttons {
+    justify-content: center;
+  }
+
+  .description {
+    margin-bottom: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .glitch {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
