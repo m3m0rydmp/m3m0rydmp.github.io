@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import config from './config';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Writeups from './components/Writeups';
