@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Page Not Found</title>
+    <script>
+      // Redirect to the React app's 404 page
+      // This allows GitHub Pages to serve our custom error page
+      var pathname = window.location.pathname;
+      
+      // Store the missing path so React can display it
+      sessionStorage.setItem('redirectedFrom404', pathname);
+      
+      // Redirect to home with a query parameter to trigger error page
+      window.location.replace(
+        window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/') + '/?404=' + encodeURIComponent(pathname)
+      );
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to error page...</p>
+  </body>
+</html>

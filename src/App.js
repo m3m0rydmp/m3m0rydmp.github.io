@@ -15,11 +15,13 @@ function App() {
   useEffect(() => {
     // Check URL for error page routes (/404, /403, /50x)
     const path = window.location.pathname;
-    if (path === '/404') {
+    const params = new URLSearchParams(window.location.search);
+    
+    if (path === '/404' || params.has('404')) {
       setErrorCode(404);
-    } else if (path === '/403') {
+    } else if (path === '/403' || params.has('403')) {
       setErrorCode(403);
-    } else if (path === '/50x') {
+    } else if (path === '/50x' || params.has('50x')) {
       setErrorCode(500);
     }
   }, []);
