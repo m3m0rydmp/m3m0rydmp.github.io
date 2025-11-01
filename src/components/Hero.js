@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import config from '../config';
 import './Hero.css';
 
@@ -6,14 +6,14 @@ function Hero() {
   const [displayText, setDisplayText] = useState('');
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
   const [matrixChars, setMatrixChars] = useState([]);
-  const taglines = config.taglines || [config.tagline || ''];
+  
+  const taglines = useMemo(() => config.taglines || [config.tagline || ''], []);
   const currentTagline = taglines[currentTaglineIndex];
 
   // ASCII characters for Matrix rain effect
   const asciiChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
 
   useEffect(() => {
-    let index = 0;
     let charIndex = 0;
     const typingSpeed = 50; // ms per character
     const displayDuration = 2000; // ms to show complete text
