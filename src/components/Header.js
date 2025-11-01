@@ -9,19 +9,19 @@ function Header({ activeSection, setActiveSection }) {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['home', 'writeups', 'projects', 'about'];
-      const scrollPosition = window.scrollY + 100; // Slightly lower threshold for detection
+      const scrollPosition = window.scrollY + 150; // Detection point in viewport
 
-      for (const sectionId of sections) {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          // Check if section is in viewport considering the header offset
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(sectionId);
-            break;
-          }
+      // Check sections in reverse order (bottom to top)
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const element = document.getElementById(sections[i]);
+        if (element && element.offsetTop <= scrollPosition) {
+          setActiveSection(sections[i]);
+          return;
         }
       }
+      
+      // Default to home if at very top
+      setActiveSection('home');
     };
 
     window.addEventListener('scroll', handleScroll);
