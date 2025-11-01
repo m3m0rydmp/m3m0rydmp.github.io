@@ -58,6 +58,21 @@ function Hero() {
     return () => clearInterval(matrixInterval);
   }, []);
 
+  const handleButtonClick = (e, targetId) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <section id="home" className="hero">
       <div className="hero-content">
@@ -73,10 +88,18 @@ function Hero() {
         <p className="description">{config.description}</p>
 
         <div className="cta-buttons">
-          <a href="#writeups" className="btn btn-primary">
+          <a 
+            href="#writeups" 
+            className="btn btn-primary"
+            onClick={(e) => handleButtonClick(e, 'writeups')}
+          >
             {config.hero.primaryButtonText}
           </a>
-          <a href="#about" className="btn btn-secondary">
+          <a 
+            href="#about" 
+            className="btn btn-secondary"
+            onClick={(e) => handleButtonClick(e, 'about')}
+          >
             {config.hero.secondaryButtonText}
           </a>
         </div>

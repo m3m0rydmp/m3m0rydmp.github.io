@@ -9,7 +9,7 @@ function Header({ activeSection, setActiveSection }) {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['home', 'writeups', 'projects', 'about'];
-      const scrollPosition = window.scrollY + 100; // Offset for header
+      const scrollPosition = window.scrollY + 80; // Match header offset
 
       for (const sectionId of sections) {
         const element = document.getElementById(sectionId);
