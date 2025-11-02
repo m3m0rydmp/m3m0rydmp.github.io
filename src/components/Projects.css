@@ -42,6 +42,25 @@
   color: var(--primary-purple);
   margin-bottom: var(--spacing-md);
   text-shadow: 0 0 10px var(--primary-purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  width: 100%;
+}
+
+.project-icon img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  filter: drop-shadow(0 0 10px var(--primary-cyan));
+  transition: all var(--transition-normal);
+}
+
+.project-card:hover .project-icon img {
+  filter: drop-shadow(0 0 15px var(--primary-magenta));
+  transform: scale(1.1);
 }
 
 .project-card h3 {

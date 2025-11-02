@@ -55,7 +55,7 @@ export const config = {
   // ========== WRITEUPS SECTION ==========
   writeups: {
     sectionTitle: "WRITEUPS & EXPLORATIONS",
-    sectionDescription: "Detailed walkthroughs of CTF challenges and security explorations",
+    sectionDescription: "Walkthroughs from CTFs, Labs, and Courses",
     // Example writeups - add/remove as needed
     items: [
       {
@@ -82,28 +82,28 @@ export const config = {
   // ========== PROJECTS SECTION ==========
   projects: {
     sectionTitle: "FEATURED PROJECTS",
-    sectionDescription: "Notable projects and research work",
+    sectionDescription: "Some projects and stuffs that I made cause I'm bored",
     items: [
       {
         id: 1,
-        title: "Writeups Hub",
-        icon: "◆",
-        description: "A collection of detailed cybersecurity and CTF writeups",
-        link: "#writeups"
+        title: "Clairvoyance",
+        icon: "/images/clairvoyance.png",
+        description: "A keylogger that captures keystrokes, screenshots, and sends data via Google Drive.",
+        link: "https://github.com/m3m0rydmp/Clairvoyance"
       },
       {
         id: 2,
         title: "Security Tools",
-        icon: "◇",
-        description: "Custom scripts and tools for security research and penetration testing",
-        link: "#"
+        icon: "/images/radar.png",
+        description: "A Free Vessel Tracker that uses AISstream OpenAPI to track vessels",
+        link: "https://github.com/m3m0rydmp/AISstream-Vessel-Tracker"
       },
       {
         id: 3,
         title: "Research & Analysis",
-        icon: "▥",
-        description: "Technical documentation and security findings from my explorations",
-        link: "#"
+        icon: "/images/admin.png",
+        description: "A script meant to be used for USB-Drop Attack",
+        link: "https://github.com/m3m0rydmp/Rev3nant"
       }
     ]
   },

@@ -7,21 +7,45 @@ import Projects from './components/Projects';
 import About from './components/About';
 import Footer from './components/Footer';
 import ErrorPage from './components/ErrorPage';
+import LetterGlitch from './components/LetterGlitch';
+import IntroVideo from './components/IntroVideo';
 import './App.css';
 
 // Main home page component
 function HomePage({ activeSection, setActiveSection }) {
+  const [triggerDecryption, setTriggerDecryption] = useState(false);
+  
+  const handleIntroComplete = () => {
+    setTriggerDecryption(true);
+  };
+  
   return (
-    <div className="terminal-frame">
-      <Header activeSection={activeSection} setActiveSection={setActiveSection} />
-      <main>
-        <Hero />
-        <Writeups />
-        <Projects />
-        <About />
-      </main>
-      <Footer />
-    </div>
+    <>
+      {/* Intro Video Component */}
+      <IntroVideo onIntroComplete={handleIntroComplete} />
+      
+      {/* Full page letter glitch background */}
+      <div className="letter-glitch-background">
+        <LetterGlitch 
+          glitchColors={['#0a0e27', '#54c1e6', '#1a1a2e']}
+          glitchSpeed={80}
+          centerVignette={false}
+          outerVignette={false}
+          smooth={true}
+        />
+      </div>
+      
+      <div className="terminal-frame">
+        <Header activeSection={activeSection} setActiveSection={setActiveSection} />
+        <main>
+          <Hero triggerDecryption={triggerDecryption} />
+          <Writeups />
+          <Projects />
+          <About />
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 }
 

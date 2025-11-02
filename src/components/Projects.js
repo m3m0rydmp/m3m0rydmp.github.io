@@ -13,7 +13,13 @@ function Projects() {
       <div className="projects-grid">
         {config.projects.items.map((project) => (
           <div key={project.id} className="project-card">
-            <div className="project-icon">{project.icon}</div>
+            <div className="project-icon">
+              {project.icon ? (
+                <img src={project.icon} alt={project.title} />
+              ) : (
+                <span>📦</span>
+              )}
+            </div>
             <h3>{project.title}</h3>
             <p>{project.description}</p>
             <a href={project.link} className="project-link">EXPLORE →</a>

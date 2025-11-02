@@ -1,17 +1,62 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import config from '../config';
 import './Hero.css';
 
-function Hero() {
+function Hero({ triggerDecryption = false }) {
   const [displayText, setDisplayText] = useState('');
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
   const [matrixChars, setMatrixChars] = useState([]);
+  const [titleText, setTitleText] = useState('');
+  const [isDecrypting, setIsDecrypting] = useState(false);
+  const hasDecrypted = useRef(false);
   
   const taglines = useMemo(() => config.taglines || [config.tagline || ''], []);
   const currentTagline = taglines[currentTaglineIndex];
+  const mainTitle = config.hero.mainTitle;
 
   // ASCII characters for Matrix rain effect
   const asciiChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+
+  // Decryption animation on first load or when triggered by video end
+  useEffect(() => {
+    // Skip if already decrypted and not being re-triggered
+    if (hasDecrypted.current && !triggerDecryption) return;
+    
+    // If triggered from video, reset the flag
+    if (triggerDecryption) {
+      hasDecrypted.current = false;
+    }
+
+    setIsDecrypting(true);
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let iteration = 0;
+    const speed = 30; // ms per frame
+    
+    const decrypt = () => {
+      setTitleText(prevText => {
+        return mainTitle.split('').map((char, index) => {
+          if (index < iteration) {
+            return mainTitle[index];
+          }
+          if (char === ' ') return ' ';
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join('');
+      });
+      
+      iteration += 1/3; // Slower reveal
+      
+      if (iteration < mainTitle.length) {
+        setTimeout(decrypt, speed);
+      } else {
+        setIsDecrypting(false);
+        hasDecrypted.current = true;
+      }
+    };
+    
+    decrypt();
+  }, [mainTitle, triggerDecryption]);
+
+  // Tagline typing effect
 
   useEffect(() => {
     let charIndex = 0;
@@ -76,9 +121,15 @@ function Hero() {
   return (
     <section id="home" className="hero">
       <div className="hero-content">
-        <h1 className="glitch" data-text={config.hero.mainTitle}>
-          {config.hero.mainTitle}
-        </h1>
+        {isDecrypting ? (
+          <h1 className="title-decrypting">
+            {titleText || mainTitle}
+          </h1>
+        ) : (
+          <h1 className="glitch layers" data-text={mainTitle}>
+            <span>{mainTitle}</span>
+          </h1>
+        )}
         
         <p className="subtitle">
           <span className="cursor"></span>
