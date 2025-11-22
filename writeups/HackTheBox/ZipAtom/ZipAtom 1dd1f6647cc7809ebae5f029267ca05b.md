@@ -2,7 +2,7 @@
 
 Difficulty: Very Easy
 OS: Windows
-Category: Red Team
+Category: Offensive
 
 ![ff0bce59-dd63-4f2e-b613-daf833e08447-avatar.webp](ff0bce59-dd63-4f2e-b613-daf833e08447-avatar.webp)
 

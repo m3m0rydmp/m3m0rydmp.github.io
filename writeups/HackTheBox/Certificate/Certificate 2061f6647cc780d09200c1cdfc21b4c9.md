@@ -2,7 +2,7 @@
 
 Difficulty: Hard
 OS: Windows
-Category: Red Team
+Category: Offensive
 
 ![certificate.webp](certificate.webp)
 

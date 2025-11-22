@@ -2,7 +2,7 @@
 
 Difficulty: Easy
 OS: Windows
-Category: Red Team
+Category: Offensive
 
 ![escapeTwo.webp](escapeTwo.webp)
 

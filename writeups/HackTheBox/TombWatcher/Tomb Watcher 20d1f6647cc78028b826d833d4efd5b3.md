@@ -2,7 +2,7 @@
 
 Difficulty: Medium
 OS: Windows
-Category: Red Team
+Category: Offensive
 
 ![tombWatcher.webp](tombWatcher.webp)
 
