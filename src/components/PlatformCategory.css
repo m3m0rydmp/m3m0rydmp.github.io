@@ -1,7 +1,6 @@
 .platform-category-page {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
 }
 
 .platform-category-shell {
@@ -9,17 +8,16 @@
   grid-template-columns: 320px 1fr;
   gap: var(--spacing-lg);
   align-items: flex-start;
-  min-height: 100vh;
   padding: 0 var(--spacing-lg) 0 0;
   position: relative;
   z-index: 2;
 }
 
 .platform-sidebar {
-  position: sticky;
-  top: 0;
+  position: sticky !important;
+  top: 0 !important;
   align-self: flex-start;
-  height: 100vh;
+  max-height: 100vh;
   overflow-y: auto;
 }
 
@@ -39,6 +37,33 @@
   border-bottom: 1px solid rgba(84, 193, 230, 0.2);
   padding-bottom: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
+}
+
+.platform-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.platform-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(84, 193, 230, 0.4);
+}
+
+.platform-flag {
+  background: rgba(84, 193, 230, 0.15);
+  border: 1px solid rgba(84, 193, 230, 0.5);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--primary-cyan);
+  margin: 0;
 }
 
 .platform-category-header h2 {

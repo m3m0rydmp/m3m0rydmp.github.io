@@ -5,11 +5,11 @@ import WriteupDrawer from './WriteupDrawer';
 import './PlatformCategory.css';
 
 const PLATFORM_DEFINITIONS = {
-  hackthebox: { label: 'HackTheBox', badge: 'HTB', description: 'Machines, challenges, and labs straight from the green screen.' },
-  tryhackme: { label: 'TryHackMe', badge: 'THM', description: 'Guided rooms, learning paths, and seasonal events.' },
-  ctfs: { label: 'CTFs', badge: 'CTF', description: 'Jeopardy and attack/defense events worth remembering.' },
-  vulnlab: { label: 'VulnLab', badge: 'VL', description: 'Adversary-simulated nodes with enterprise-grade tradecraft.' },
-  bugbountyreports: { label: 'Bug Bounty Reports', badge: 'BBR', description: 'Disclosure-ready findings from real programs.' }
+  hackthebox: { label: 'Hack The Box', badge: 'HTB', logo: '/icons/htb.jpeg', description: 'Machines, challenges, sherlocks, and labs' },
+  tryhackme: { label: 'TryHackMe', badge: 'THM', logo: '/icons/THM.png', description: 'Guided rooms, learning paths, and seasonal events.' },
+  ctfs: { label: 'CTFs', badge: 'CTF', logo: '/icons/flag.png', description: 'Jeopardy and attack/defense events worth remembering.' },
+  vulnlab: { label: 'VulnLab', badge: 'VL', logo: '/icons/vulnlab.jpg', description: 'Adversary-simulated nodes with enterprise-grade tradecraft.' },
+  bugbountyreports: { label: 'Bug Bounty Reports', badge: 'BBR', logo: '/icons/bug.png', description: 'Disclosure-ready findings from real programs.' }
 };
 
 const normalizeLabel = (value = '') => value.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -49,7 +49,12 @@ function PlatformCategory() {
 
         <div className="platform-category-content">
           <div className="platform-category-header">
-            <p className="platform-flag">{platformDef.badge}</p>
+            <div className="platform-brand">
+              {platformDef.logo && (
+                <img src={platformDef.logo} alt={platformDef.label} className="platform-logo" />
+              )}
+              <p className="platform-flag">{platformDef.badge}</p>
+            </div>
             <div>
               <h2>{platformDef.label}</h2>
               <p>{platformDef.description}</p>

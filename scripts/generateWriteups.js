@@ -146,6 +146,21 @@ function normalizeRelativePath(relativePath) {
 
 function createSlug(relativePath) {
   const segments = relativePath.replace(/\.md$/i, '').split('/');
+  
+  if (segments.length >= 2) {
+    const platform = segments[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    
+    const machineName = segments[1]
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    
+    return `${platform}-${machineName}`;
+  }
+  
   return segments
     .map((segment) =>
       segment

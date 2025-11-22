@@ -2,7 +2,7 @@
 
 Difficulty: Easy
 OS: Linux
-Category: Red Team
+Category: Offensive
 
 ![f6a56cec6e9826b4ed124fb4155abc66.webp](f6a56cec6e9826b4ed124fb4155abc66.webp)
 
