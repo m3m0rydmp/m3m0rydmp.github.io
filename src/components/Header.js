@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import config from '../config';
 import './Header.css';
 
 function Header({ activeSection, setActiveSection }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-
   // Scroll spy - detect which section is in view
   useEffect(() => {
     const handleScroll = () => {
@@ -31,7 +29,6 @@ function Header({ activeSection, setActiveSection }) {
 
   const handleNavClick = (e, href) => {
     e.preventDefault();
-    setMenuOpen(false);
 
     if (href === '#home') {
       // Scroll to top for home button
@@ -63,7 +60,7 @@ function Header({ activeSection, setActiveSection }) {
           <span className="bracket">]</span>
         </div>
 
-        <ul className={`nav-links ${menuOpen ? 'active' : ''}`}>
+        <ul className="nav-links">
           {config.navigation.links.map((link) => {
             const sectionId = link.href.substring(1); // Remove # from href
             return (
@@ -79,15 +76,6 @@ function Header({ activeSection, setActiveSection }) {
             );
           })}
         </ul>
-
-        <div 
-          className={`hamburger ${menuOpen ? 'active' : ''}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
       </nav>
     </header>
   );

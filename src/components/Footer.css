@@ -16,14 +16,29 @@
   gap: var(--spacing-lg);
 }
 
-.footer-content p {
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.footer-content p,
+.footer-left p {
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.footer-disclaimer {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-style: italic;
+  margin-top: 0.25rem;
 }
 
 .social-links {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   align-items: center;
 }
 
@@ -94,6 +109,10 @@
   .footer-content {
     flex-direction: column;
     text-align: center;
+  }
+
+  .footer-left {
+    align-items: center;
   }
 
   .social-links {

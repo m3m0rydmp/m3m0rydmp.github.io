@@ -33,6 +33,8 @@ export const config = {
     linkedin: "https://linkedin.com/in/robsacote",
     hackthebox: "https://app.hackthebox.com/profile/m3m0rydmp",
     tryhackme: "https://tryhackme.com/p/Res0nanc3",
+    resetsec: "https://resetsec.github.io/",
+    pwndesal: "https://pwndesal.xyz",
     email: "robwilssacote@gmail.com"
   },
 
@@ -55,28 +57,7 @@ export const config = {
   // ========== WRITEUPS SECTION ==========
   writeups: {
     sectionTitle: "WRITEUPS & EXPLORATIONS",
-    sectionDescription: "Walkthroughs from CTFs, Labs, and Courses",
-    // Example writeups - add/remove as needed
-    items: [
-      {
-        id: 1,
-        title: "Your First Writeup",
-        category: "CTF",
-        difficulty: "medium",
-        date: "Nov 01, 2024",
-        readTime: "~10 min",
-        description: "Add your CTF writeups here. Edit this config file to update."
-      },
-      {
-        id: 2,
-        title: "Challenge 2",
-        category: "Web",
-        difficulty: "hard",
-        date: "Coming Soon",
-        readTime: "~15 min",
-        description: "Your next challenge writeup will appear here."
-      }
-    ]
+    sectionDescription: "These are writeups from various platforms I've played or practiced on. The labs posted here are retired or have permission to be made public. In the future, any labs I've solved that aren't yet allowed to have public writeups will be password-protected until the platform permits their release."
   },
 
   // ========== PROJECTS SECTION ==========
@@ -128,6 +109,7 @@ export const config = {
   // ========== FOOTER SECTION ==========
   footer: {
     copyrightText: "© 2025 m3m0rydmp. All rights reserved.",
+    disclaimer: "DISCLAIMER: This website is Vibe Coded",
     socialButtons: [
       {
         name: "GitHub",
@@ -148,6 +130,16 @@ export const config = {
         name: "TryHackMe",
         icon: "tryhackme",
         url: "socialLinks.tryhackme"
+      },
+      {
+        name: "ResetSec",
+        icon: "resetsec",
+        url: "socialLinks.resetsec"
+      },
+      {
+        name: "PWNDESAL",
+        icon: "pwndesal",
+        url: "socialLinks.pwndesal"
       }
     ]
   },

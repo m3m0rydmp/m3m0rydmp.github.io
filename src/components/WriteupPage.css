@@ -1,0 +1,106 @@
+.writeup-shell {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  z-index: 1;
+  align-items: stretch;
+}
+
+.writeup-shell.drawer-collapsed {
+  grid-template-columns: 0 1fr;
+}
+
+.writeup-shell .writeup-drawer {
+  transform: translateX(0);
+}
+
+.writeup-shell.drawer-collapsed .writeup-drawer {
+  transform: translateX(-100%);
+}
+
+.writeup-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.writeup-content-inner {
+  min-height: 100vh;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: rgba(2, 6, 18, 0.35);
+}
+
+.drawer-overlay {
+  display: none;
+}
+
+.drawer-floating-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(84, 193, 230, 0.4);
+  background: rgba(5, 11, 24, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex-direction: column;
+  z-index: 4;
+  cursor: pointer;
+}
+
+.drawer-floating-toggle span {
+  width: 18px;
+  height: 2px;
+  background: var(--text-secondary);
+}
+
+.drawer-floating-toggle[data-state="open"] span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.drawer-floating-toggle[data-state="open"] span:nth-child(2) {
+  opacity: 0;
+}
+
+.drawer-floating-toggle[data-state="open"] span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.writeup-shell.drawer-collapsed .drawer-floating-toggle {
+  display: flex;
+}
+
+@media (max-width: 1024px) {
+  .writeup-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .writeup-shell .writeup-drawer {
+    transform: translateX(-105%);
+  }
+
+  .writeup-shell.drawer-open .writeup-drawer {
+    transform: translateX(0);
+  }
+
+  .drawer-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+  }
+
+  .writeup-shell.drawer-open .drawer-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

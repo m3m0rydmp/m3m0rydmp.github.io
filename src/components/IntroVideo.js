@@ -9,6 +9,7 @@ const IntroVideo = ({ onIntroComplete }) => {
   const [showGlitchTransition, setShowGlitchTransition] = useState(false);
   const [isMuted, setIsMuted] = useState(true); // Start muted for autoplay
   const [showUnmutePrompt, setShowUnmutePrompt] = useState(false);
+  const [hideReplayButton, setHideReplayButton] = useState(false);
   const videoRef = useRef(null);
   const sessionKey = 'cyberpunk_intro_session';
 
@@ -78,6 +79,26 @@ const IntroVideo = ({ onIntroComplete }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Hide replay button when user is at footer
+  useEffect(() => {
+    const handleScroll = () => {
+      const footer = document.querySelector('.footer');
+      if (footer) {
+        const footerRect = footer.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const isAtFooter = footerRect.top < windowHeight && footerRect.bottom > 0;
+        setHideReplayButton(isAtFooter);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   const handleVideoEnd = () => {
     // Show glitch transition
     setShowGlitchTransition(true);
@@ -113,14 +134,12 @@ const IntroVideo = ({ onIntroComplete }) => {
   const handleReplay = () => {
     setShowIntro(true);
     setIsPlaying(true);
-    setIsMuted(false); // Don't mute on manual replay
+    setIsMuted(false);
     setShowUnmutePrompt(false);
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.muted = false;
-      videoRef.current.play().catch(error => {
-        console.log('Video play error:', error);
-      });
+      videoRef.current.play().catch(() => {});
     }
   };
 
@@ -134,17 +153,12 @@ const IntroVideo = ({ onIntroComplete }) => {
 
   useEffect(() => {
     if (isPlaying && videoRef.current) {
-      // For first time autoplay, video must be muted
       videoRef.current.muted = isMuted;
-      videoRef.current.play().catch(error => {
-        console.log('Video autoplay prevented:', error);
-        // If autoplay fails, try with muted
+      videoRef.current.play().catch(() => {
         if (videoRef.current) {
           videoRef.current.muted = true;
           setIsMuted(true);
-          videoRef.current.play().catch(e => {
-            console.log('Video play failed:', e);
-          });
+          videoRef.current.play().catch(() => {});
         }
       });
     }
@@ -188,7 +202,7 @@ const IntroVideo = ({ onIntroComplete }) => {
       )}
 
       {/* Replay Button (fixed position) */}
-      {!showIntro && (
+      {!showIntro && !hideReplayButton && (
         <button className="replay-intro-btn" onClick={handleReplay} title="Watch Intro Again">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M8 5v14l11-7z" fill="currentColor"/>
