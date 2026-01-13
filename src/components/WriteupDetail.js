@@ -43,7 +43,7 @@ function WriteupDetail() {
    */
   const processedContent = useMemo(() => {
     if (!content) return { markdown: '', metadata: null };
-    
+
     const lines = content.split('\n');
     let difficulty = null;
     let os = null;
@@ -88,7 +88,7 @@ function WriteupDetail() {
         return <img {...rest} src={resolvedSrc} alt={alt || ''} loading="lazy" />;
       },
       a: ({ children, ...rest }) => (
-        <a {...rest} target="_blank" rel="noreferrer">
+        <a {...rest} target="_blank" rel="noopener noreferrer">
           {children}
         </a>
       ),

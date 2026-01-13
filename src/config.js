@@ -14,7 +14,7 @@ export const config = {
     "You don't have to learn everything, just keep going..."
   ],
   description: "Writeups | Labs | Explorations",
-  
+
   // ========== PROFILE INFORMATION ==========
   profile: {
     name: "m3m0rydmp",
@@ -74,14 +74,14 @@ export const config = {
       },
       {
         id: 2,
-        title: "Security Tools",
+        title: "AISstream Vessel Tracker",
         icon: "/images/radar.png",
         description: "A Free Vessel Tracker that uses AISstream OpenAPI to track vessels",
         link: "https://github.com/m3m0rydmp/AISstream-Vessel-Tracker"
       },
       {
         id: 3,
-        title: "Research & Analysis",
+        title: "Rev3nant",
         icon: "/images/admin.png",
         description: "A script meant to be used for USB-Drop Attack",
         link: "https://github.com/m3m0rydmp/Rev3nant"
@@ -160,7 +160,7 @@ export const config = {
       borderColor: "#1a1f2e",  // Border color
       borderGlow: "#54c1e6"    // Border glow - Cyan
     },
-    
+
     // Animation speeds (in seconds)
     transitions: {
       fast: 0.2,

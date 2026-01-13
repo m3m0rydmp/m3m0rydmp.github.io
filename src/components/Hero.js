@@ -9,7 +9,7 @@ function Hero({ triggerDecryption = false }) {
   const [titleText, setTitleText] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);
   const hasDecrypted = useRef(false);
-  
+
   const taglines = useMemo(() => config.taglines || [config.tagline || ''], []);
   const currentTagline = taglines[currentTaglineIndex];
   const mainTitle = config.hero.mainTitle;
@@ -21,7 +21,7 @@ function Hero({ triggerDecryption = false }) {
   useEffect(() => {
     // Skip if already decrypted and not being re-triggered
     if (hasDecrypted.current && !triggerDecryption) return;
-    
+
     // If triggered from video, reset the flag
     if (triggerDecryption) {
       hasDecrypted.current = false;
@@ -31,7 +31,7 @@ function Hero({ triggerDecryption = false }) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
     let iteration = 0;
     const speed = 30; // ms per frame
-    
+
     const decrypt = () => {
       setTitleText(prevText => {
         return mainTitle.split('').map((char, index) => {
@@ -42,9 +42,9 @@ function Hero({ triggerDecryption = false }) {
           return chars[Math.floor(Math.random() * chars.length)];
         }).join('');
       });
-      
-      iteration += 1/3; // Slower reveal
-      
+
+      iteration += 1 / 3; // Slower reveal
+
       if (iteration < mainTitle.length) {
         setTimeout(decrypt, speed);
       } else {
@@ -52,7 +52,7 @@ function Hero({ triggerDecryption = false }) {
         hasDecrypted.current = true;
       }
     };
-    
+
     decrypt();
   }, [mainTitle, triggerDecryption]);
 
@@ -93,7 +93,7 @@ function Hero({ triggerDecryption = false }) {
         duration: 2 + Math.random() * 2
       };
       setMatrixChars(prev => [...prev, newChar]);
-      
+
       setTimeout(() => {
         setMatrixChars(prev => prev.filter(c => c.id !== newChar.id));
       }, (newChar.duration + newChar.delay) * 1000);
@@ -130,7 +130,7 @@ function Hero({ triggerDecryption = false }) {
             <span>{mainTitle}</span>
           </h1>
         )}
-        
+
         <p className="subtitle">
           <span className="cursor"></span>
           <span className="typing-text">{displayText}</span>
@@ -139,15 +139,15 @@ function Hero({ triggerDecryption = false }) {
         <p className="description">{config.description}</p>
 
         <div className="cta-buttons">
-          <a 
-            href="#writeups" 
+          <a
+            href="#writeups"
             className="btn btn-primary"
             onClick={(e) => handleButtonClick(e, 'writeups')}
           >
             {config.hero.primaryButtonText}
           </a>
-          <a 
-            href="#about" 
+          <a
+            href="#about"
             className="btn btn-secondary"
             onClick={(e) => handleButtonClick(e, 'about')}
           >
@@ -158,14 +158,14 @@ function Hero({ triggerDecryption = false }) {
 
       <div className="hero-profile">
         <div className="profile-picture-container">
-          <img 
-            src={config.profile.profilePicture} 
+          <img
+            src={config.profile.profilePicture}
             alt={config.profile.profileAlt}
             className="profile-picture"
           />
         </div>
         <div className="grid-lines"></div>
-        
+
         {/* Matrix Rain Effect */}
         <div className="matrix-rain">
           {matrixChars.map(item => (

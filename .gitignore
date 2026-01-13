@@ -48,6 +48,7 @@ TODO.md
 
 # Generated assets
 public/writeups/
+src/data/writeupsData.json
 
 # Sensitive files
 **/*.secret.*

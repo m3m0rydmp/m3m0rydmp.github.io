@@ -5,23 +5,23 @@ import config from '../config';
 import writeupsData from '../data/writeupsData.json';
 import './WriteupDrawer.css';
 
-function WriteupDrawer({ isOpen = true, onToggle = () => {}, showToggle = true, className = '' }) {
+function WriteupDrawer({ isOpen = true, onToggle = () => { }, showToggle = true, className = '' }) {
   const navigate = useNavigate();
   const location = useLocation();
   const navLinks = config.navigation.links ?? [];
   const profileImage = config.profile.profilePicture;
   const socialLinks = config.socialLinks ?? {};
 
-  const isWriteupDetailPage = location.pathname.startsWith('/writeups/') && 
-                               !location.pathname.startsWith('/writeups/platform/');
+  const isWriteupDetailPage = location.pathname.startsWith('/writeups/') &&
+    !location.pathname.startsWith('/writeups/platform/');
 
   const currentPlatform = React.useMemo(() => {
     if (!isWriteupDetailPage) return null;
-    
+
     const pathParts = location.pathname.split('/');
     const slug = pathParts[pathParts.length - 1];
     const writeup = writeupsData.items?.find(item => item.slug === slug);
-    
+
     if (writeup && writeup.platform) {
       return writeup.platform.toLowerCase().replace(/[^a-z0-9]/g, '');
     }
@@ -49,9 +49,9 @@ function WriteupDrawer({ isOpen = true, onToggle = () => {}, showToggle = true, 
 
   const handleNavClick = (e, href) => {
     e.preventDefault();
-    
+
     navigate('/');
-    
+
     setTimeout(() => {
       if (href === '#home') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -99,7 +99,7 @@ function WriteupDrawer({ isOpen = true, onToggle = () => {}, showToggle = true, 
 
       <nav className="drawer-nav" aria-label="Primary">
         {isWriteupDetailPage && currentPlatform && (
-          <a 
+          <a
             href="#back"
             onClick={handleBackToPlatform}
             className="drawer-back-button"
@@ -109,8 +109,8 @@ function WriteupDrawer({ isOpen = true, onToggle = () => {}, showToggle = true, 
           </a>
         )}
         {navLinks.map((link) => (
-          <a 
-            key={link.name} 
+          <a
+            key={link.name}
             href={link.href}
             onClick={(e) => handleNavClick(e, link.href)}
           >
@@ -121,13 +121,15 @@ function WriteupDrawer({ isOpen = true, onToggle = () => {}, showToggle = true, 
 
       <div className="drawer-footer">
         <div className="drawer-socials" aria-label="Social links">
-          {Object.entries(socialLinks).map(([key, value]) => (
-            value ? (
-              <a key={key} href={value} target="_blank" rel="noopener noreferrer" title={key}>
-                <img src={getIconPath(key)} alt={`${key} icon`} />
-              </a>
-            ) : null
-          ))}
+          {Object.entries(socialLinks)
+            .filter(([key]) => key !== 'email')
+            .map(([key, value]) => (
+              value ? (
+                <a key={key} href={value} target="_blank" rel="noopener noreferrer" title={key}>
+                  <img src={getIconPath(key)} alt={`${key} icon`} />
+                </a>
+              ) : null
+            ))}
         </div>
         <p className="drawer-handle">Hack The Box writeups</p>
       </div>

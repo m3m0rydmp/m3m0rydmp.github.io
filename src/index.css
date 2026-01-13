@@ -63,14 +63,12 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
+  background-image:
+    repeating-linear-gradient(0deg,
       rgba(84, 193, 230, 0.03),
       rgba(84, 193, 230, 0.03) 1px,
       transparent 1px,
-      transparent 2px
-    );
+      transparent 2px);
 }
 
 #root {
@@ -88,13 +86,11 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: 9999;
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
+  background-image: repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px);
   animation: scanlines 8s linear infinite;
 }
 
@@ -102,10 +98,37 @@ body::before {
   0% {
     transform: translateY(0);
   }
+
   100% {
     transform: translateY(10px);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body::before {
+    animation: none;
+    display: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable heavy canvas animations */
+  .letter-glitch-background canvas {
+    display: none !important;
+  }
+}
+
 
 /* ================================================================
    UTILITY CLASSES
@@ -239,37 +262,42 @@ body::before {
 
 @keyframes glitch-effect {
   0% {
-    text-shadow: 
+    text-shadow:
       0 0 10px var(--primary-cyan),
       -2px 2px 0 var(--primary-magenta),
       2px -2px 0 var(--primary-purple);
   }
+
   20% {
-    text-shadow: 
+    text-shadow:
       0 0 10px var(--primary-cyan),
       -2px 2px 0 var(--primary-purple),
       2px -2px 0 var(--primary-magenta);
   }
+
   40% {
-    text-shadow: 
+    text-shadow:
       0 0 10px var(--primary-cyan),
       2px 2px 0 var(--primary-magenta),
       -2px -2px 0 var(--primary-purple);
   }
+
   60% {
-    text-shadow: 
+    text-shadow:
       0 0 10px var(--primary-cyan),
       -2px -2px 0 var(--primary-purple),
       2px 2px 0 var(--primary-magenta);
   }
+
   80% {
-    text-shadow: 
+    text-shadow:
       0 0 10px var(--primary-cyan),
       2px -2px 0 var(--primary-magenta),
       -2px 2px 0 var(--primary-purple);
   }
+
   100% {
-    text-shadow: 
+    text-shadow:
       0 0 10px var(--primary-cyan),
       -2px 2px 0 var(--primary-magenta),
       2px -2px 0 var(--primary-purple);
@@ -280,25 +308,33 @@ body::before {
   0% {
     transform: translateY(0);
   }
+
   100% {
     transform: translateY(50px);
   }
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-20px);
   }
 }
 
 @keyframes cursor-blink {
-  0%, 49% {
+
+  0%,
+  49% {
     opacity: 1;
   }
-  50%, 100% {
+
+  50%,
+  100% {
     opacity: 0;
   }
 }
