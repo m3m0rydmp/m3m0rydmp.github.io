@@ -74,6 +74,20 @@ const CERT_GROUPS = {
                 alt: 'Red Team Operator Level 1',
                 issuer: 'Hack The Box',
                 image: '/certs/FullHouse.jpg'
+            },
+            {
+                id: 'poo',
+                title: 'P.O.O.',
+                alt: 'HTB Mini Pro Lab — Certificate of Completion',
+                issuer: 'Hack The Box',
+                image: '/certs/poo.jpg'
+            },
+            {
+                id: 'cyberskills2026',
+                title: 'Global Cyber Skills Benchmark 2026',
+                alt: 'Project Nightfall — Certified CTF Player',
+                issuer: 'Hack The Box',
+                image: '/certs/cyber-skills-global.jpg'
             }
         ]
     }
