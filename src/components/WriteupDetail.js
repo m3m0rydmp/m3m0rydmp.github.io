@@ -3,19 +3,33 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
+import GithubSlugger from 'github-slugger';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ArrowUp, List, Lock, ShieldAlert } from 'lucide-react';
 import writeupsData from '../data/writeupsData.json';
 import './WriteupDetail.css';
 
-// Register common languages for syntax highlighter
+// Register languages for the syntax highlighter. PrismLight (not the full
+// Prism bundle) is used intentionally to keep the bundle small — languages
+// must be registered explicitly.
 import js from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
 import bash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
 import powershell from 'react-syntax-highlighter/dist/esm/languages/prism/powershell';
 import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
 import json from 'react-syntax-highlighter/dist/esm/languages/prism/json';
 import yaml from 'react-syntax-highlighter/dist/esm/languages/prism/yaml';
+import c from 'react-syntax-highlighter/dist/esm/languages/prism/c';
+import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql';
+import php from 'react-syntax-highlighter/dist/esm/languages/prism/php';
+import http from 'react-syntax-highlighter/dist/esm/languages/prism/http';
+import ruby from 'react-syntax-highlighter/dist/esm/languages/prism/ruby';
+import go from 'react-syntax-highlighter/dist/esm/languages/prism/go';
+import ini from 'react-syntax-highlighter/dist/esm/languages/prism/ini';
+import docker from 'react-syntax-highlighter/dist/esm/languages/prism/docker';
+import diff from 'react-syntax-highlighter/dist/esm/languages/prism/diff';
+import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup';
+import csharp from 'react-syntax-highlighter/dist/esm/languages/prism/csharp';
 
 SyntaxHighlighter.registerLanguage('javascript', js);
 SyntaxHighlighter.registerLanguage('bash', bash);
@@ -23,6 +37,59 @@ SyntaxHighlighter.registerLanguage('powershell', powershell);
 SyntaxHighlighter.registerLanguage('python', python);
 SyntaxHighlighter.registerLanguage('json', json);
 SyntaxHighlighter.registerLanguage('yaml', yaml);
+SyntaxHighlighter.registerLanguage('c', c);
+SyntaxHighlighter.registerLanguage('sql', sql);
+SyntaxHighlighter.registerLanguage('php', php);
+SyntaxHighlighter.registerLanguage('http', http);
+SyntaxHighlighter.registerLanguage('ruby', ruby);
+SyntaxHighlighter.registerLanguage('go', go);
+SyntaxHighlighter.registerLanguage('ini', ini);
+SyntaxHighlighter.registerLanguage('docker', docker);
+SyntaxHighlighter.registerLanguage('diff', diff);
+SyntaxHighlighter.registerLanguage('markup', markup);
+SyntaxHighlighter.registerLanguage('csharp', csharp);
+
+const METADATA_LINE_RE = /^(platform|difficulty|os|category|tags?|date)\s*:\s*(.+)$/i;
+// Zero-width space/non-joiner/joiner/BOM characters Notion sometimes exports.
+const ZERO_WIDTH_RE = /[​‌‍﻿]/g;
+
+function getDifficultyClass(value) {
+  const normalized = (value || '').toLowerCase();
+  if (normalized.includes('insane')) return 'insane';
+  if (normalized.includes('medium')) return 'medium';
+  if (normalized.includes('very easy')) return 'very-easy';
+  if (normalized.includes('easy')) return 'easy';
+  if (normalized.includes('hard')) return 'hard';
+  return 'unknown';
+}
+
+function getOsClass(value) {
+  const normalized = (value || '').toLowerCase();
+  if (normalized.includes('windows')) return 'windows';
+  if (normalized.includes('linux')) return 'linux';
+  return 'unknown-os';
+}
+
+function getCategoryClass(value) {
+  const normalized = (value || '').toLowerCase();
+  if (normalized.includes('offensive') || normalized.includes('red')) return 'offensive';
+  if (normalized.includes('defensive') || normalized.includes('blue')) return 'defensive';
+  return 'neutral-team';
+}
+
+// SyntaxHighlighter's vscDarkPlus theme applies its own inline background
+// to the wrapping element; `customStyle` overrides that so fenced blocks
+// keep the site's card look (bg/border/radius) instead of vsc-plus's own.
+const CODE_BLOCK_STYLE = {
+  background: '#050b18',
+  padding: 'var(--spacing-md)',
+  borderRadius: '8px',
+  border: '1px solid rgba(84, 193, 230, 0.28)',
+  margin: 'var(--spacing-md) 0',
+  lineHeight: 1.45,
+  boxShadow: 'inset 0 0 0 1px rgba(84, 193, 230, 0.08)',
+  overflowX: 'auto'
+};
 
 function resolveImageSource(src, assetBase) {
   if (!src) return '';
@@ -154,60 +221,68 @@ function WriteupDetail() {
   }, [writeup]);
 
   /**
-   * @time O(n) where n is number of lines in content (max 15 scanned)
+   * @time O(n) where n is number of lines in content (max 20 metadata-scanned)
    * @space O(n) for contentLines array copy
    */
   const processedContent = useMemo(() => {
     if (!content) return { markdown: '', metadata: null, toc: [] };
 
-    const lines = content.split('\n');
+    // Notion exports sometimes include zero-width characters; strip them
+    // up front so metadata/heading regexes match reliably.
+    const cleanedContent = content.replace(ZERO_WIDTH_RE, '');
+    const lines = cleanedContent.split('\n');
     let difficulty = null;
     let os = null;
     let category = null;
-    let metadataEndIndex = -1;
-    const toc = [];
+    const metadataLineIndexes = [];
 
-    // Extract headings for ToC
-    lines.forEach((line) => {
-      const headingMatch = line.match(/^(#{2,3})\s+(.+)$/);
+    // Metadata lines (Platform/Difficulty/OS/Category/Tags/Date) are
+    // stripped independently — a document doesn't need all of them present
+    // for the ones that ARE present to be hidden from the rendered body.
+    for (let i = 0; i < Math.min(lines.length, 20); i++) {
+      const line = lines[i].trim();
+      const match = line.match(METADATA_LINE_RE);
+      if (!match) continue;
+
+      metadataLineIndexes.push(i);
+      const key = match[1].toLowerCase();
+      const value = match[2].trim();
+      if (key === 'difficulty') difficulty = value;
+      else if (key === 'os') os = value;
+      else if (key === 'category') category = value;
+    }
+
+    const contentLines = [...lines];
+    for (let i = metadataLineIndexes.length - 1; i >= 0; i--) {
+      contentLines.splice(metadataLineIndexes[i], 1);
+    }
+
+    // Extract headings for ToC using the same slug algorithm as
+    // rehype-slug (github-slugger), walking ALL heading levels (not just
+    // h2/h3) so the slugger's duplicate-suffix counter stays in sync with
+    // rehype-slug's actual DOM traversal — otherwise a same-named h1/h4+
+    // elsewhere in the doc would shift every subsequent slug out of sync.
+    const slugger = new GithubSlugger();
+    const toc = [];
+    contentLines.forEach((line) => {
+      const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
       if (headingMatch) {
         const level = headingMatch[1].length;
         const text = headingMatch[2].trim();
-        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        toc.push({ level, text, id });
+        const id = slugger.slug(text);
+        if (level === 2 || level === 3) {
+          toc.push({ level, text, id });
+        }
       }
     });
 
-    for (let i = 0; i < Math.min(lines.length, 15); i++) {
-      const line = lines[i].trim();
-      if (/^Difficulty\s*:\s*(.+)$/i.test(line)) {
-        difficulty = line.match(/^Difficulty\s*:\s*(.+)$/i)[1].trim();
-        metadataEndIndex = Math.max(metadataEndIndex, i);
-      } else if (/^OS\s*:\s*(.+)$/i.test(line)) {
-        os = line.match(/^OS\s*:\s*(.+)$/i)[1].trim();
-        metadataEndIndex = Math.max(metadataEndIndex, i);
-      } else if (/^Category\s*:\s*(.+)$/i.test(line)) {
-        category = line.match(/^Category\s*:\s*(.+)$/i)[1].trim();
-        metadataEndIndex = Math.max(metadataEndIndex, i);
-      }
-    }
+    const metadata = (difficulty && os && category) ? { difficulty, os, category } : null;
 
-    if (difficulty && os && category) {
-      const contentLines = [...lines];
-      for (let i = metadataEndIndex; i >= 0; i--) {
-        const line = contentLines[i].trim();
-        if (/^(Difficulty|OS|Category)\s*:/i.test(line)) {
-          contentLines.splice(i, 1);
-        }
-      }
-      return {
-        markdown: contentLines.join('\n'),
-        metadata: { difficulty, os, category },
-        toc
-      };
-    }
-
-    return { markdown: content, metadata: null, toc };
+    return {
+      markdown: contentLines.join('\n'),
+      metadata,
+      toc
+    };
   }, [content]);
 
   const markdownComponents = useMemo(() => {
@@ -221,27 +296,41 @@ function WriteupDetail() {
           {children}
         </a>
       ),
-      p: ({ children }) => {
-        const childArray = React.Children.toArray(children);
-        return <p>{childArray}</p>;
-      },
-      code({ node, inline, className, children, ...props }) {
-        const match = /language-(\w+)/.exec(className || '');
-        return !inline && match ? (
+      // react-markdown v9 no longer passes an `inline` prop to `code` — a
+      // fenced block and inline code both hit this renderer with no way to
+      // tell them apart from the props alone. Instead, `pre` (which only
+      // wraps fenced blocks) intercepts its already-rendered <code> child
+      // and routes it through the syntax highlighter; this `code` renderer
+      // therefore only ever handles genuine inline code.
+      code: ({ className, children, ...props }) => (
+        <code className={className} {...props}>
+          {children}
+        </code>
+      ),
+      pre: ({ children, ...props }) => {
+        const codeElement = Array.isArray(children) ? children[0] : children;
+        const codeProps = codeElement?.props || {};
+        const match = /language-(\w+)/.exec(codeProps.className || '');
+        const language = match ? match[1] : 'text';
+        const codeString = String(codeProps.children ?? '').replace(/\n$/, '');
+
+        return (
           <SyntaxHighlighter
             style={vscDarkPlus}
-            language={match[1]}
+            customStyle={CODE_BLOCK_STYLE}
+            language={language}
             PreTag="div"
             {...props}
           >
-            {String(children).replace(/\n$/, '')}
+            {codeString}
           </SyntaxHighlighter>
-        ) : (
-          <code className={className} {...props}>
-            {children}
-          </code>
         );
-      }
+      },
+      table: ({ children, ...rest }) => (
+        <div className="table-scroll">
+          <table {...rest}>{children}</table>
+        </div>
+      )
     };
   }, [assetBase]);
 
@@ -335,33 +424,15 @@ function WriteupDetail() {
 
                 {processedContent.metadata && (
                   <div className="md-meta-container header-meta">
-                    <span className={`md-meta-pill difficulty ${((value) => {
-                      const normalized = (value || '').toLowerCase();
-                      if (normalized.includes('insane')) return 'insane';
-                      if (normalized.includes('medium')) return 'medium';
-                      if (normalized.includes('very easy')) return 'very-easy';
-                      if (normalized.includes('easy')) return 'easy';
-                      if (normalized.includes('hard')) return 'hard';
-                      return 'unknown';
-                    })(processedContent.metadata.difficulty)}`}>
+                    <span className={`md-meta-pill difficulty ${getDifficultyClass(processedContent.metadata.difficulty)}`}>
                       {processedContent.metadata.difficulty}
                     </span>
 
-                    <span className={`md-meta-pill os ${((value) => {
-                      const normalized = (value || '').toLowerCase();
-                      if (normalized.includes('windows')) return 'windows';
-                      if (normalized.includes('linux')) return 'linux';
-                      return 'unknown-os';
-                    })(processedContent.metadata.os)}`}>
+                    <span className={`md-meta-pill os ${getOsClass(processedContent.metadata.os)}`}>
                       {processedContent.metadata.os}
                     </span>
 
-                    <span className={`md-meta-pill category ${((value) => {
-                      const normalized = (value || '').toLowerCase();
-                      if (normalized.includes('offensive') || normalized.includes('red')) return 'offensive';
-                      if (normalized.includes('defensive') || normalized.includes('blue')) return 'defensive';
-                      return 'neutral-team';
-                    })(processedContent.metadata.category)}`}>
+                    <span className={`md-meta-pill category ${getCategoryClass(processedContent.metadata.category)}`}>
                       {processedContent.metadata.category}
                     </span>
                   </div>
