@@ -1,27 +1,34 @@
 import React, { useEffect, useRef } from 'react';
 import './PixelBlast.css';
 
+const TARGET_FPS = 30;
+const FRAME_BUDGET_MS = 1000 / TARGET_FPS;
+const RESIZE_DEBOUNCE_MS = 150;
+
 const PixelBlast = () => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return undefined;
+
+    const reducedMotionQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reducedMotionQuery && reducedMotionQuery.matches) {
+      // Respect the user's OS-level preference: skip the animated canvas entirely.
+      return undefined;
+    }
 
     const ctx = canvas.getContext('2d');
     let animationFrameId;
+    let lastFrameTime = 0;
+    let running = true;
+    let isVisible = true;
 
     let particles = [];
-    const gap = 40; // Gap between points
+    const gap = 56; // Gap between points (reduced density vs. original 40px for perf)
     const mouseRadius = 150;
     const mouse = { x: -1000, y: -1000 };
     const ripples = [];
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      init();
-    };
 
     const init = () => {
       particles = [];
@@ -46,6 +53,18 @@ const PixelBlast = () => {
       }
     };
 
+    const resizeImmediate = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      init();
+    };
+
+    let resizeTimeout = null;
+    const resize = () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resizeImmediate, RESIZE_DEBOUNCE_MS);
+    };
+
     const handleMouseMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
@@ -67,14 +86,46 @@ const PixelBlast = () => {
       if (ripples.length > 5) ripples.shift();
     };
 
+    const handleVisibilityChange = () => {
+      running = !document.hidden;
+      if (running && isVisible) {
+        lastFrameTime = 0;
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('mousedown', handleClick);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    resize();
+    // Pause the animation entirely when the canvas scrolls off-screen.
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+          if (isVisible && running) {
+            lastFrameTime = 0;
+            animationFrameId = requestAnimationFrame(animate);
+          }
+        });
+      },
+      { threshold: 0 }
+    );
+    intersectionObserver.observe(canvas);
 
-    const animate = () => {
+    resizeImmediate();
+
+    const animate = (timestamp) => {
+      if (!running || !isVisible) return;
+
+      if (timestamp - lastFrameTime < FRAME_BUDGET_MS) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTime = timestamp;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Update ripples
@@ -96,7 +147,7 @@ const PixelBlast = () => {
           const angle = Math.atan2(dy, dx);
           const pushX = Math.cos(angle) * force * 40;
           const pushY = Math.sin(angle) * force * 40;
-          
+
           p.vx -= pushX * 0.2;
           p.vy -= pushY * 0.2;
         }
@@ -137,13 +188,16 @@ const PixelBlast = () => {
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      intersectionObserver.disconnect();
+      if (resizeTimeout) clearTimeout(resizeTimeout);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);

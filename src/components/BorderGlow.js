@@ -77,10 +77,19 @@ const BorderGlow = ({
   fillOpacity = 0.5
 }) => {
   const cardRef = useRef(null);
+  const cachedRectRef = useRef(null);
+  const rafIdRef = useRef(null);
+  const pendingPointRef = useRef(null);
+
+  const refreshCachedRect = useCallback(() => {
+    if (cardRef.current) {
+      cachedRectRef.current = cardRef.current.getBoundingClientRect();
+    }
+  }, []);
 
   const getCenterOfElement = useCallback((el) => {
-    const { width, height } = el.getBoundingClientRect();
-    return [width / 2, height / 2];
+    const rect = cachedRectRef.current || el.getBoundingClientRect();
+    return [rect.width / 2, rect.height / 2];
   }, []);
 
   const getEdgeProximity = useCallback((el, x, y) => {
@@ -117,15 +126,17 @@ const BorderGlow = ({
     return degrees;
   }, [getCenterOfElement]);
 
-  const handlePointerMove = useCallback((e) => {
+  const processPendingPoint = useCallback(() => {
+    rafIdRef.current = null;
     const card = cardRef.current;
-    if (!card) {
+    const point = pendingPointRef.current;
+    if (!card || !point || !cachedRectRef.current) {
       return;
     }
 
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const rect = cachedRectRef.current;
+    const x = point.clientX - rect.left;
+    const y = point.clientY - rect.top;
 
     const edge = getEdgeProximity(card, x, y);
     const angle = getCursorAngle(card, x, y);
@@ -133,6 +144,36 @@ const BorderGlow = ({
     card.style.setProperty('--edge-proximity', `${(edge * 100).toFixed(3)}`);
     card.style.setProperty('--cursor-angle', `${angle.toFixed(3)}deg`);
   }, [getEdgeProximity, getCursorAngle]);
+
+  // Throttle pointermove to one update per animation frame, and avoid
+  // calling getBoundingClientRect() (a layout-forcing call) on every move —
+  // the rect is cached on pointer enter / window resize instead.
+  const handlePointerMove = useCallback((e) => {
+    if (!cardRef.current) {
+      return;
+    }
+
+    pendingPointRef.current = { clientX: e.clientX, clientY: e.clientY };
+
+    if (rafIdRef.current === null) {
+      rafIdRef.current = requestAnimationFrame(processPendingPoint);
+    }
+  }, [processPendingPoint]);
+
+  const handlePointerEnter = useCallback(() => {
+    refreshCachedRect();
+  }, [refreshCachedRect]);
+
+  useEffect(() => {
+    refreshCachedRect();
+    window.addEventListener('resize', refreshCachedRect);
+    return () => {
+      window.removeEventListener('resize', refreshCachedRect);
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
+  }, [refreshCachedRect]);
 
   useEffect(() => {
     if (!animated || !cardRef.current) {
@@ -181,6 +222,7 @@ const BorderGlow = ({
   return (
     <div
       ref={cardRef}
+      onPointerEnter={handlePointerEnter}
       onPointerMove={handlePointerMove}
       className={`border-glow-card ${className}`}
       style={{

@@ -1,11 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './SplashScreen.css';
 import config from '../config';
+
+const FADE_DURATION_MS = 500;
 
 const SplashScreen = ({ onComplete }) => {
   const [fading, setFading] = useState(false);
   const [loadingText, setLoadingText] = useState('Initializing runtime environment');
   const [progress, setProgress] = useState(0);
+  const skippedRef = useRef(false);
+  const timersRef = useRef([]);
+
+  const finish = useCallback(() => {
+    if (skippedRef.current) return;
+    skippedRef.current = true;
+    timersRef.current.forEach((id) => clearTimeout(id));
+    timersRef.current = [];
+    setFading(true);
+    const completeTimer = setTimeout(() => {
+      if (onComplete) onComplete();
+    }, FADE_DURATION_MS);
+    timersRef.current.push(completeTimer);
+  }, [onComplete]);
 
   useEffect(() => {
     // Sequence of loading texts
@@ -35,6 +51,8 @@ const SplashScreen = ({ onComplete }) => {
       if (onComplete) onComplete();
     }, 3000); // 2500 timeout + 500ms fade transition length
 
+    timersRef.current.push(fadeTimer, completeTimer);
+
     return () => {
       clearInterval(interval);
       clearTimeout(fadeTimer);
@@ -42,8 +60,21 @@ const SplashScreen = ({ onComplete }) => {
     };
   }, [onComplete]);
 
+  // Skippable: any click or keypress finishes the splash immediately.
+  useEffect(() => {
+    const handleKeyDown = () => finish();
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [finish]);
+
   return (
-    <div className={`splash-screen ${fading ? 'fade-out' : ''}`}>
+    <div
+      className={`splash-screen ${fading ? 'fade-out' : ''}`}
+      onClick={finish}
+      role="button"
+      tabIndex={0}
+      aria-label="Skip intro"
+    >
       <div className="splash-grid" aria-hidden="true"></div>
       <div className="splash-glitch-rects" aria-hidden="true">
         {Array.from({ length: 12 }).map((_, index) => (
@@ -61,6 +92,16 @@ const SplashScreen = ({ onComplete }) => {
           <span></span>
           <span></span>
         </div>
+        <button
+          type="button"
+          className="splash-skip"
+          onClick={(e) => {
+            e.stopPropagation();
+            finish();
+          }}
+        >
+          [ SKIP ]
+        </button>
       </div>
     </div>
   );

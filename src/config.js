@@ -22,7 +22,7 @@ export const config = {
     bio: "Welcome to my digital space. This page will be a showcase of my writeups from CTF competitions, labs, courses or maybe Bug bounty (if I will ever get one). This space is a knowledge sharing for anyone who is interested.\n\nI try to be more detailed as much as possible with my writeups, so as to be understandable for beginners and seasoned pros alike.",
     // Profile picture URL - set this to your image path
     // Example: "/images/profile.jpg" or "https://example.com/profile.jpg"
-    profilePicture: "/images/profile.png",
+    profilePicture: "/images/profile.webp",
     // Add alt text for the profile picture
     profileAlt: "m3m0rydmp profile picture"
   },

@@ -12,7 +12,7 @@ import './components/WriteupPage.css';
 import './App.css';
 
 const SPLASH_LAST_SHOWN_KEY = 'homeSplashLastShownAt';
-const SPLASH_RESHOW_MS = 5 * 60 * 1000;
+const SPLASH_RESHOW_MS = 10 * 60 * 1000;
 
 function shouldShowHomeSplash() {
   if (typeof window === 'undefined') {
@@ -20,7 +20,9 @@ function shouldShowHomeSplash() {
   }
 
   try {
-    const lastShownRaw = window.sessionStorage.getItem(SPLASH_LAST_SHOWN_KEY);
+    // localStorage (not sessionStorage) so a return visit within the reshow
+    // window doesn't replay the splash even in a fresh tab/session.
+    const lastShownRaw = window.localStorage.getItem(SPLASH_LAST_SHOWN_KEY);
     const lastShown = Number(lastShownRaw);
 
     if (!Number.isFinite(lastShown) || lastShown <= 0) {
@@ -40,7 +42,7 @@ function recordHomeSplashShown() {
   }
 
   try {
-    window.sessionStorage.setItem(SPLASH_LAST_SHOWN_KEY, String(Date.now()));
+    window.localStorage.setItem(SPLASH_LAST_SHOWN_KEY, String(Date.now()));
   } catch {
     // No-op when storage is unavailable.
   }
@@ -84,7 +86,7 @@ function HomePage({ activeSection, setActiveSection }) {
     <>
       {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
 
-
+      <PixelBlast />
 
       <div className="terminal-frame">
         <Header activeSection={activeSection} setActiveSection={setActiveSection} />
@@ -161,7 +163,6 @@ function App() {
 
   return (
     <Router>
-      <PixelBlast />
       <Helmet>
         <title>m3m0rydmp | Cyberpunk Portfolio</title>
         <meta name="description" content="Cybersecurity portfolio and writeups showcase featuring CTF solutions, pentesting reports, and security research." />

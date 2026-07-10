@@ -113,7 +113,7 @@ function LockedWriteupPanel({ writeup, onUnlocked }) {
         {denied ? <ShieldAlert size={40} /> : <Lock size={40} />}
       </div>
       <h2 className="locked-writeup-title">ENCRYPTED DATASHARD</h2>
-      <p className="locked-writeup-subtitle">// ENTER DECRYPTION KEY</p>
+      <p className="locked-writeup-subtitle">{'// ENTER DECRYPTION KEY'}</p>
       <form className="locked-writeup-form" onSubmit={handleSubmit}>
         <input
           type="password"

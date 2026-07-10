@@ -307,6 +307,16 @@
   animation: cursor-blink 1s infinite;
 }
 
+/* Pause the continuous glitch/cursor animations while the hero is
+   scrolled out of view (toggled via IntersectionObserver in Hero.js).
+   Visual appearance is unchanged while .in-view is present. */
+.hero:not(.in-view) .glitch span,
+.hero:not(.in-view) .glitch::before,
+.hero:not(.in-view) .glitch::after,
+.hero:not(.in-view) .cursor {
+  animation-play-state: paused;
+}
+
 .description {
   font-size: var(--font-size-base);
   color: var(--text-secondary);

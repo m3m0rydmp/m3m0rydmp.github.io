@@ -7,7 +7,25 @@ function Hero({ triggerDecryption = false }) {
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
   const [titleText, setTitleText] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);
+  const [isInView, setIsInView] = useState(true);
   const hasDecrypted = useRef(false);
+  const heroRef = useRef(null);
+
+  // Pause the always-on glitch/cursor CSS animations while the hero is
+  // scrolled out of view — they keep repainting layered pseudo-elements
+  // even when nothing is visible.
+  useEffect(() => {
+    const node = heroRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, []);
 
   const taglines = useMemo(() => config.taglines || [config.tagline || ''], []);
   const currentTagline = taglines[currentTaglineIndex];
@@ -116,7 +134,7 @@ function Hero({ triggerDecryption = false }) {
   };
 
   return (
-    <section id="home" className="hero">
+    <section id="home" className={`hero ${isInView ? 'in-view' : ''}`} ref={heroRef}>
       <div className="hero-content">
         {isDecrypting ? (
           <h1 className="title-decrypting">
