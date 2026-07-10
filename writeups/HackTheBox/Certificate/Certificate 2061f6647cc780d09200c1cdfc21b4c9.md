@@ -97,7 +97,7 @@ Explore the webpage, then register as a student.
 
 At this point you can fuzz for directories. But we can directly visit this url, this allows us to upload files such as pdf, zip, etc. `http://certificate.htb/upload.php?s_id=36` 
 
-![image.png](image.png)
+![image.png](image.webp)
 
 ### Exploitation
 
@@ -235,7 +235,7 @@ Using the https://github.com/CsEnox/SeManageVolumeExploit we have access to the 
 
 Navigate to `C:\Users\Public` you will find a **ca.pfx** this will be used for golden certificate attack later, download it to your machine.
 
-![image.png](image%201.png)
+![image.png](image%201.webp)
 
 Then use the certificate to forge for **Administrator**
 

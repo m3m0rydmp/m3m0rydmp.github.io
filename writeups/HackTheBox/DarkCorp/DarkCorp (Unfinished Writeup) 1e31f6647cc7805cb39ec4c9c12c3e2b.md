@@ -32,7 +32,7 @@ Looking at the well designed website, if we scroll at the bottom we can see a *C
 
 You can try to test it out, and try sending a message without properly inputting an email *e.g. email@email.com*
 
-![image.png](image.png)
+![image.png](image.webp)
 
 ### Drip Email
 
@@ -46,9 +46,9 @@ By searching through *Google* we can see there’s a [CVE-2024-42008]([https://s
 
 Here are some information about the vulnerability:
 
-![image.png](image%201.png)
+![image.png](image%201.webp)
 
-![image.png](image%202.png)
+![image.png](image%202.webp)
 
 ```python
 <body title="bgcolor=foo" name="bar style=animation-name:progress-bar-stripes onanimationstart=alert(origin)
@@ -59,7 +59,7 @@ Foo
 
 But there is also a condition here, it must be an HTML email:
 
-![image.png](image%203.png)
+![image.png](image%203.webp)
 
 ### Testing the Payload
 
@@ -76,19 +76,19 @@ But the thing is, this did not work on me, it only returned an html code itself 
 
 I tried going back to the homepage where we can send a message. Intercept the request using BurpSuite, then send another message.
 
-![image.png](image%204.png)
+![image.png](image%204.webp)
 
 Unforetunately, the recipient is to *support@drip.htb*. Our **GOAL** is to read other user’s email witha *cross-site scripting* payload. 
 
 To test, modify the *recipient* to your email. This will send the content to your email.
 
-![image.png](image%205.png)
+![image.png](image%205.webp)
 
 It worked!
 
 I tried replacing the *message* with an XSS payload but it does not work on me.
 
-![image.png](image%206.png)
+![image.png](image%206.webp)
 
 So I tried another method, as I look around I found this python script that will automate the exploit.
 
@@ -194,7 +194,7 @@ Now run the python code and adjust the *uid* input starting from 1.
 
 If the *uid* is 2, you’ll get this message.
 
-![image.png](image%207.png)
+![image.png](image%207.webp)
 
 Then visit that link and it will give you access denied.
 
@@ -206,7 +206,7 @@ You will get the reset token, visit the link, change the password, then login as
 
 On the search bar, type anything and it will return an **SQL** error
 
-![image.png](image%208.png)
+![image.png](image%208.webp)
 
 This is an SQL error particularly **Postgres** with the following query:
 
@@ -573,11 +573,11 @@ Nmap done: 1 IP address (1 host up) scanned in 79.20 seconds
 
 Then let’s look at `172.16.20.2` 
 
-![image.png](image%209.png)
+![image.png](image%209.webp)
 
 We can access port 5000 with the credentials of `victor.r:victor1gustavo@#`
 
-![image.png](image%2010.png)
+![image.png](image%2010.webp)
 
 Let’s enumerate the domain using `bloodhound-python` 
 

