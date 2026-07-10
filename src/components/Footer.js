@@ -5,14 +5,14 @@ import './Footer.css';
 function Footer() {
   const getIconPath = (iconName) => {
     const iconMap = {
-      github: '/icons/github.png',
-      linkedin: '/icons/linkedin.png',
-      hackthebox: '/icons/htb.jpeg',
-      tryhackme: '/icons/THM.png',
+      github: '/icons/github.webp',
+      linkedin: '/icons/linkedin.webp',
+      hackthebox: '/icons/htb.webp',
+      tryhackme: '/icons/THM.webp',
       resetsec: '/icons/resetsec.webp',
-      pwndesal: '/icons/pwndesal.jpg'
+      pwndesal: '/icons/pwndesal.webp'
     };
-    return iconMap[iconName] || '/icons/github.png';
+    return iconMap[iconName] || '/icons/github.webp';
   };
 
   return (
@@ -22,11 +22,11 @@ function Footer() {
           <p>{config.footer.copyrightText}</p>
           {config.footer.disclaimer && <p className="footer-disclaimer">{config.footer.disclaimer}</p>}
         </div>
-        
+
         <div className="social-links">
-          <a 
-            href={config.socialLinks.github} 
-            target="_blank" 
+          <a
+            href={config.socialLinks.github}
+            target="_blank"
             rel="noopener noreferrer"
             className="social-button"
             title="GitHub"
@@ -35,9 +35,9 @@ function Footer() {
             <span className="social-label">GitHub</span>
           </a>
 
-          <a 
-            href={config.socialLinks.linkedin} 
-            target="_blank" 
+          <a
+            href={config.socialLinks.linkedin}
+            target="_blank"
             rel="noopener noreferrer"
             className="social-button"
             title="LinkedIn"
@@ -46,9 +46,9 @@ function Footer() {
             <span className="social-label">LinkedIn</span>
           </a>
 
-          <a 
-            href={config.socialLinks.hackthebox} 
-            target="_blank" 
+          <a
+            href={config.socialLinks.hackthebox}
+            target="_blank"
             rel="noopener noreferrer"
             className="social-button"
             title="HackTheBox"
@@ -57,9 +57,9 @@ function Footer() {
             <span className="social-label">HTB</span>
           </a>
 
-          <a 
-            href={config.socialLinks.tryhackme} 
-            target="_blank" 
+          <a
+            href={config.socialLinks.tryhackme}
+            target="_blank"
             rel="noopener noreferrer"
             className="social-button"
             title="TryHackMe"
@@ -68,9 +68,9 @@ function Footer() {
             <span className="social-label">THM</span>
           </a>
 
-          <a 
-            href={config.socialLinks.resetsec} 
-            target="_blank" 
+          <a
+            href={config.socialLinks.resetsec}
+            target="_blank"
             rel="noopener noreferrer"
             className="social-button"
             title="ResetSec"
@@ -79,9 +79,9 @@ function Footer() {
             <span className="social-label">ResetSec</span>
           </a>
 
-          <a 
-            href={config.socialLinks.pwndesal} 
-            target="_blank" 
+          <a
+            href={config.socialLinks.pwndesal}
+            target="_blank"
             rel="noopener noreferrer"
             className="social-button"
             title="PWNDESAL"

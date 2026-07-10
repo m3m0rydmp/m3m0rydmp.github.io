@@ -204,7 +204,7 @@ export KRB5CCNAME=rr.parker.ccache
 
 Check the active Kerberos ticket
 
-![image.png](image.png)
+![image.png](image.webp)
 
 Now that everything is setup, we can now run `bloodhound-python` . 
 
@@ -212,7 +212,7 @@ Now that everything is setup, we can now run `bloodhound-python` .
 bloodhound-python -u 'rr.parker' -p '8#t5HE8L!W3A' -c all -d rustykey.htb -ns 10.129.191.241 --zip -k -dns-timeout 30
 ```
 
-![image.png](image%201.png)
+![image.png](image%201.webp)
 
 This is the shortest path from the user `rr.parker` . The arrows are the guide in order to gain a foothold and on to the user. You can click on those nodes and observe more information on what would out attack vector be.
 
@@ -319,7 +319,7 @@ python3 timecrack.py rustykey.hashes rockyou.txt
 
 Look into your `bloodhound-python` and search for the user who has the RID ending with **1125**.
 
-![image.png](image%202.png)
+![image.png](image%202.webp)
 
 Request a `TGT` ticket for the user `IT-COMPUTER3$`
 
@@ -370,7 +370,7 @@ Then get the `user.txt` flag at `Desktop`
 
 In the `Desktop` file, there’s a `.pdf` file along with the `user.txt` download it and view.
 
-![image.png](image%203.png)
+![image.png](image%203.webp)
 
 We’ll move on to the user `ee.reed` so we will user `IT-COMPUTER3$` to get its creds.
 

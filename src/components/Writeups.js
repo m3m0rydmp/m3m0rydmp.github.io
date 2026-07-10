@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import config from '../config';
 import writeupsData from '../data/writeupsData.json';
+import BorderGlow from './BorderGlow';
 import './Writeups.css';
 
 const PLATFORM_SECTIONS = [
@@ -40,18 +41,19 @@ const PLATFORM_SECTIONS = [
 const normalizeLabel = (value = '') => value.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 const CATEGORY_ICONS = {
-  hackthebox: '/icons/htb.jpeg',
-  tryhackme: '/icons/THM.png',
-  ctf: '/icons/flag.png',
-  ctfs: '/icons/flag.png',
-  vulnlab: '/icons/vulnlab.jpg',
-  bugbountyreports: '/icons/bug.png',
-  uncategorized: '/icons/title_icon.jpg'
+  hackthebox: '/icons/htb.webp',
+  tryhackme: '/icons/THM.webp',
+  ctf: '/icons/flag.webp',
+  ctfs: '/icons/flag.webp',
+  vulnlab: '/icons/vulnlab.webp',
+  bugbountyreports: '/icons/bug.webp',
+  uncategorized: '/icons/title_icon.webp'
 };
+
 
 function Writeups() {
   const items = useMemo(() => writeupsData.items ?? [], []);
-  
+
   /**
    * @time O(n * m) where n is writeups, m is platform sections (typically <10)
    * @space O(n) for grouped sections with references
@@ -90,7 +92,7 @@ function Writeups() {
 
   const getIconForSection = (sectionKey) => {
     const normalizedKey = normalizeLabel(sectionKey);
-    return CATEGORY_ICONS[normalizedKey] || '/icons/radar.png';
+    return CATEGORY_ICONS[normalizedKey] || '/icons/radar.webp';
   };
 
   const getPlatformRoute = (sectionKey) => {
@@ -111,21 +113,35 @@ function Writeups() {
 
       <div className="platform-tile-grid">
         {groupedSections.map((section) => (
-          <Link
+          <BorderGlow
             key={section.key}
-            to={getPlatformRoute(section.key)}
-            className="platform-tile"
+            className="platform-tile-glow"
+            edgeSensitivity={36}
+            glowColor="188 68 62"
+            backgroundColor="#040c19"
+            borderRadius={14}
+            glowRadius={36}
+            glowIntensity={1.0}
+            coneSpread={24}
+            animated={false}
+            colors={['#2f9ac2', '#54c1e6', '#39c4b6']}
+            fillOpacity={0.35}
           >
-            <span className="platform-tile-media">
-              <img src={getIconForSection(section.key)} alt={`${section.label} icon`} loading="lazy" />
-            </span>
-            <span className="platform-tile-copy">
-              <h3>{section.label}</h3>
-            </span>
-            <span className="platform-count-chip">
-              {section.items.length} {section.items.length === 1 ? 'report' : 'reports'}
-            </span>
-          </Link>
+            <Link
+              to={getPlatformRoute(section.key)}
+              className="platform-tile"
+            >
+              <span className="platform-tile-media">
+                <img src={getIconForSection(section.key)} alt={`${section.label} icon`} loading="lazy" />
+              </span>
+              <span className="platform-tile-copy">
+                <h3>{section.label}</h3>
+              </span>
+              <span className="platform-count-chip">
+                {section.items.length} {section.items.length === 1 ? 'report' : 'reports'}
+              </span>
+            </Link>
+          </BorderGlow>
         ))}
       </div>
     </section>

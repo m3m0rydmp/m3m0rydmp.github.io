@@ -5,7 +5,6 @@ import './Hero.css';
 function Hero({ triggerDecryption = false }) {
   const [displayText, setDisplayText] = useState('');
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
-  const [matrixChars, setMatrixChars] = useState([]);
   const [titleText, setTitleText] = useState('');
   const [isDecrypting, setIsDecrypting] = useState(false);
   const hasDecrypted = useRef(false);
@@ -14,8 +13,25 @@ function Hero({ triggerDecryption = false }) {
   const currentTagline = taglines[currentTaglineIndex];
   const mainTitle = config.hero.mainTitle;
 
-  // ASCII characters for Matrix rain effect
-  const asciiChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+  const profileImageCandidates = useMemo(() => {
+    const configuredPath = config.profile.profilePicture || '/images/profile';
+    const hasExtension = /\.[a-z0-9]+$/i.test(configuredPath);
+    const candidates = hasExtension
+      ? [configuredPath, '/images/profile.png', '/images/profile.webp', '/images/profile.jpg']
+      : [
+        `${configuredPath}.png`,
+        `${configuredPath}.webp`,
+        `${configuredPath}.jpg`,
+        configuredPath,
+        '/images/profile.png',
+        '/images/profile.webp',
+        '/images/profile.jpg'
+      ];
+
+    return [...new Set(candidates)];
+  }, []);
+
+  const [profileImageIndex, setProfileImageIndex] = useState(0);
 
   // Decryption animation on first load or when triggered by video end
   useEffect(() => {
@@ -82,26 +98,7 @@ function Hero({ triggerDecryption = false }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTagline, taglines]);
 
-  useEffect(() => {
-    const generateMatrixChar = () => {
-      const randomChar = asciiChars[Math.floor(Math.random() * asciiChars.length)];
-      const newChar = {
-        id: Math.random(),
-        char: randomChar,
-        left: Math.random() * 100,
-        delay: Math.random() * 0.5,
-        duration: 2 + Math.random() * 2
-      };
-      setMatrixChars(prev => [...prev, newChar]);
 
-      setTimeout(() => {
-        setMatrixChars(prev => prev.filter(c => c.id !== newChar.id));
-      }, (newChar.duration + newChar.delay) * 1000);
-    };
-
-    const matrixInterval = setInterval(generateMatrixChar, 100);
-    return () => clearInterval(matrixInterval);
-  }, []);
 
   const handleButtonClick = (e, targetId) => {
     e.preventDefault();
@@ -159,29 +156,18 @@ function Hero({ triggerDecryption = false }) {
       <div className="hero-profile">
         <div className="profile-picture-container">
           <img
-            src={config.profile.profilePicture}
+            src={profileImageCandidates[profileImageIndex]}
             alt={config.profile.profileAlt}
             className="profile-picture"
+            onError={() => {
+              if (profileImageIndex < profileImageCandidates.length - 1) {
+                setProfileImageIndex((prev) => prev + 1);
+              }
+            }}
           />
+          <span className="profile-credit" aria-hidden="true">Art by Anthony Montecillo</span>
         </div>
-        <div className="grid-lines"></div>
 
-        {/* Matrix Rain Effect */}
-        <div className="matrix-rain">
-          {matrixChars.map(item => (
-            <div
-              key={item.id}
-              className="matrix-char"
-              style={{
-                left: `${item.left}%`,
-                '--delay': `${item.delay}s`,
-                '--duration': `${item.duration}s`
-              }}
-            >
-              {item.char}
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );

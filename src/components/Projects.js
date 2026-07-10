@@ -10,22 +10,24 @@ function Projects() {
         <div className="title-underline"></div>
       </div>
 
-      <div className="projects-grid">
+      <ul className="projects-list" aria-label="Featured projects list">
         {config.projects.items.map((project) => (
-          <div key={project.id} className="project-card">
-            <div className="project-icon">
-              {project.icon ? (
-                <img src={project.icon} alt={project.title} />
-              ) : (
-                <span>📦</span>
-              )}
-            </div>
-            <h3>{project.title}</h3>
+          <li key={project.id} className="project-row">
+            <h3>
+              <a
+                href={project.link}
+                className="project-title-link"
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`Open ${project.title} repository`}
+              >
+                {project.title}
+              </a>
+            </h3>
             <p>{project.description}</p>
-            <a href={project.link} className="project-link">EXPLORE →</a>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

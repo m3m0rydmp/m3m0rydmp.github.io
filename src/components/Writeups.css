@@ -21,8 +21,57 @@
 .platform-tile-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-auto-rows: 1fr;
+  align-items: stretch;
   gap: var(--spacing-lg);
   margin-top: var(--spacing-lg);
+}
+
+.platform-tile-glow {
+  border-radius: 14px;
+  box-shadow: none;
+  height: 100%;
+}
+
+.platform-tile-glow.border-glow-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.platform-tile-glow .border-glow-inner {
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Keep a clean, uniform glow ring without mask-heavy artifacts. */
+.platform-tile-glow::before,
+.platform-tile-glow::after {
+  display: none !important;
+}
+
+.platform-tile-glow > .edge-light {
+  display: block !important;
+  inset: 0;
+  mask-image: none;
+  mix-blend-mode: normal;
+  opacity: 0;
+}
+
+.platform-tile-glow:hover > .edge-light,
+.platform-tile-glow.sweep-active > .edge-light,
+.platform-tile-glow:focus-within > .edge-light {
+  opacity: 0.85;
+}
+
+.platform-tile-glow > .edge-light::before {
+  inset: 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(84, 193, 230, 0.84),
+    inset 0 0 8px rgba(84, 193, 230, 0.34),
+    inset 0 0 16px rgba(84, 193, 230, 0.2);
 }
 
 .platform-tile {
@@ -39,25 +88,34 @@
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  transition: border var(--transition-fast), transform var(--transition-fast);
+  transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  will-change: transform;
+  height: 100%;
+  justify-content: space-between;
+  gap: var(--spacing-md);
 }
 
 .platform-tile::after {
   content: '';
   position: absolute;
   inset: 0;
-  opacity: 0;
-  background: linear-gradient(135deg, rgba(84, 193, 230, 0.2), transparent);
-  transition: opacity var(--transition-fast);
+  border-radius: inherit;
+  border: 1px solid rgba(84, 193, 230, 0);
+  box-shadow: inset 0 0 0 0 rgba(84, 193, 230, 0);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  pointer-events: none;
 }
 
 .platform-tile:hover {
   border-color: var(--primary-cyan);
-  transform: translateY(-4px);
+  transform: translate3d(0, -4px, 0);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(84, 193, 230, 0.16);
 }
 
-.platform-tile:hover::after {
-  opacity: 1;
+.platform-tile:hover::after,
+.platform-tile:focus-visible::after {
+  border-color: rgba(84, 193, 230, 0.82);
+  box-shadow: inset 0 0 8px rgba(84, 193, 230, 0.34), inset 0 0 16px rgba(84, 193, 230, 0.2);
 }
 
 .platform-tile-media {
@@ -67,7 +125,6 @@
   border: 1px solid rgba(84, 193, 230, 0.4);
   overflow: hidden;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.04);
   margin-bottom: var(--spacing-md);
 }
 
@@ -79,7 +136,7 @@
 
 .platform-tile-copy {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .platform-tile-copy h3 {
@@ -222,5 +279,16 @@
 
   .writeups-placeholder {
     flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .platform-tile {
+    transition: none;
+  }
+
+  .platform-tile::before,
+  .platform-tile::after {
+    transition: none;
   }
 }

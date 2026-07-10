@@ -1,8 +1,7 @@
 .header {
-  background-color: rgba(0, 6, 14, 0.95);
-  backdrop-filter: blur(10px);
+  background-color: rgba(0, 6, 14, 0.98);
   border-bottom: 2px solid var(--border-glow);
-  box-shadow: 0 0 20px rgba(84, 193, 230, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -43,6 +42,14 @@
   display: flex;
   list-style: none;
   gap: var(--spacing-lg);
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .nav-link {
@@ -138,5 +145,17 @@
 
   .hamburger {
     display: flex;
+  }
+
+  .nav-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: var(--spacing-md);
+  }
+
+  .nav-controls .header-search {
+    max-width: 100%;
+    margin-top: var(--spacing-sm);
   }
 }

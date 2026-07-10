@@ -12,6 +12,7 @@ function About() {
 
       <div className="about-content">
         <div className="about-text">
+          <p className="about-intro">Live from the lab, one exploit and one lesson at a time.</p>
           <p>{config.about.mainText}</p>
           <p>{config.about.additionalText}</p>
 
@@ -23,12 +24,17 @@ function About() {
         </div>
 
         <div className="about-sidebar">
-          {config.about.statusBoxes.map((box, index) => (
-            <div key={index} className="info-box">
-              <div className="info-title">{box.title}</div>
-              <div className="info-value">{box.value}</div>
-            </div>
-          ))}
+          <div className="about-monitor">
+            <p className="monitor-title">System Feed</p>
+            <ul className="monitor-list">
+              {config.about.statusBoxes.map((box, index) => (
+                <li key={index} className="monitor-item">
+                  <span className="monitor-key">{box.title}</span>
+                  <strong className="monitor-value">{box.value}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </section>

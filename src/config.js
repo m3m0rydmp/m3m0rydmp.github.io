@@ -22,7 +22,7 @@ export const config = {
     bio: "Welcome to my digital space. This page will be a showcase of my writeups from CTF competitions, labs, courses or maybe Bug bounty (if I will ever get one). This space is a knowledge sharing for anyone who is interested.\n\nI try to be more detailed as much as possible with my writeups, so as to be understandable for beginners and seasoned pros alike.",
     // Profile picture URL - set this to your image path
     // Example: "/images/profile.jpg" or "https://example.com/profile.jpg"
-    profilePicture: "/images/profile.jpg",
+    profilePicture: "/images/profile.png",
     // Add alt text for the profile picture
     profileAlt: "m3m0rydmp profile picture"
   },
@@ -68,21 +68,21 @@ export const config = {
       {
         id: 1,
         title: "Clairvoyance",
-        icon: "/images/clairvoyance.png",
+        icon: "/images/clairvoyance.webp",
         description: "A keylogger that captures keystrokes, screenshots, and sends data via Google Drive.",
         link: "https://github.com/m3m0rydmp/Clairvoyance"
       },
       {
         id: 2,
         title: "AISstream Vessel Tracker",
-        icon: "/images/radar.png",
+        icon: "/images/radar.webp",
         description: "A Free Vessel Tracker that uses AISstream OpenAPI to track vessels",
         link: "https://github.com/m3m0rydmp/AISstream-Vessel-Tracker"
       },
       {
         id: 3,
         title: "Rev3nant",
-        icon: "/images/admin.png",
+        icon: "/images/admin.webp",
         description: "A script meant to be used for USB-Drop Attack",
         link: "https://github.com/m3m0rydmp/Rev3nant"
       }

@@ -6,6 +6,7 @@ const path = require('path');
 const SOURCE_DIR = path.resolve('writeups');
 const PUBLIC_DIR = path.resolve('public', 'writeups');
 const DATA_FILE = path.resolve('src', 'data', 'writeupsData.json');
+const SEARCH_INDEX_FILE = path.resolve('src', 'data', 'searchIndex.json');
 
 const METADATA_KEYS = [
   { key: 'difficulty', pattern: /^difficulty\s*:/i },
@@ -48,6 +49,7 @@ async function main() {
 
   const files = await collectMarkdownFiles(SOURCE_DIR);
   const records = [];
+  const searchRecords = [];
 
   for (const filePath of files) {
     const content = await fs.readFile(filePath, 'utf-8');
@@ -63,15 +65,23 @@ async function main() {
       category: metadata.category,
       difficulty: metadata.difficulty,
       os: metadata.os,
-  tags: metadata.tags,
+      tags: metadata.tags,
       readTime: metadata.readTime,
       publishedAt: metadata.publishedAt,
       displayDate: metadata.displayDate,
       excerpt: metadata.excerpt,
       coverImage: metadata.coverImage,
-  platform: metadata.platform,
+      platform: metadata.platform,
       sourcePath: `/${path.posix.join('writeups', relativePath)}`,
       wordCount: metadata.wordCount
+    });
+
+    searchRecords.push({
+      id: slug,
+      slug,
+      title: metadata.title,
+      platform: metadata.platform,
+      content: stripMarkdownForSearch(content)
     });
   }
 
@@ -85,6 +95,12 @@ async function main() {
   await fs.writeFile(
     DATA_FILE,
     JSON.stringify({ generatedAt: new Date().toISOString(), items: records }, null, 2),
+    'utf-8'
+  );
+
+  await fs.writeFile(
+    SEARCH_INDEX_FILE,
+    JSON.stringify({ items: searchRecords }),
     'utf-8'
   );
 }
@@ -146,21 +162,21 @@ function normalizeRelativePath(relativePath) {
 
 function createSlug(relativePath) {
   const segments = relativePath.replace(/\.md$/i, '').split('/');
-  
+
   if (segments.length >= 2) {
     const platform = segments[0]
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
-    
+
     const machineName = segments[1]
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
-    
+
     return `${platform}-${machineName}`;
   }
-  
+
   return segments
     .map((segment) =>
       segment
@@ -256,7 +272,7 @@ function extractHeroImage(lines, relativePath) {
   if (!dir) {
     return `/${path.posix.join('writeups', imagePath)}`;
   }
-    return `/${path.posix.join('writeups', dir, imagePath)}`;
+  return `/${path.posix.join('writeups', dir, imagePath)}`;
 }
 
 function extractExcerpt(lines) {
@@ -280,10 +296,25 @@ function extractExcerpt(lines) {
     if (buffer.length >= MAX_PARAGRAPH_SCAN) break;
   }
 
-    return buffer.join(' ').slice(0, 320) || 'No summary available yet.';
+  return buffer.join(' ').slice(0, 320) || 'No summary available yet.';
 }
 
-  main().catch((error) => {
-    console.error('Failed to build writeups metadata:', error);
-    process.exit(1);
-  });
+function stripMarkdownForSearch(content) {
+  // Remove images
+  let text = content.replace(/!\[.*?\]\([^)]+\)/g, '');
+  // Remove links (keep text)
+  text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  // Remove code block backticks
+  text = text.replace(/```[a-z]*\n/gi, '\n');
+  text = text.replace(/```/g, '\n');
+  // Remove basic HTML tags
+  text = text.replace(/<[^>]+>/g, '');
+  // Collapse whitespace for smaller index
+  text = text.replace(/\s+/g, ' ').trim();
+  return text;
+}
+
+main().catch((error) => {
+  console.error('Failed to build writeups metadata:', error);
+  process.exit(1);
+});

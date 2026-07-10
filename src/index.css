@@ -124,7 +124,7 @@ body::before {
   }
 
   /* Disable heavy canvas animations */
-  .letter-glitch-background canvas {
+  .pixel-blast-canvas {
     display: none !important;
   }
 }

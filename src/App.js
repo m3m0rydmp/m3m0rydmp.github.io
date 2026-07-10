@@ -5,14 +5,50 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import ErrorPage from './components/ErrorPage';
-import LetterGlitch from './components/LetterGlitch';
-import IntroVideo from './components/IntroVideo';
+import SplashScreen from './components/SplashScreen';
 import WriteupDrawer from './components/WriteupDrawer';
+import PixelBlast from './components/PixelBlast';
 import './components/WriteupPage.css';
 import './App.css';
 
+const SPLASH_LAST_SHOWN_KEY = 'homeSplashLastShownAt';
+const SPLASH_RESHOW_MS = 5 * 60 * 1000;
+
+function shouldShowHomeSplash() {
+  if (typeof window === 'undefined') {
+    return true;
+  }
+
+  try {
+    const lastShownRaw = window.sessionStorage.getItem(SPLASH_LAST_SHOWN_KEY);
+    const lastShown = Number(lastShownRaw);
+
+    if (!Number.isFinite(lastShown) || lastShown <= 0) {
+      return true;
+    }
+
+    return Date.now() - lastShown >= SPLASH_RESHOW_MS;
+  } catch {
+    // If storage is unavailable, keep splash behavior predictable.
+    return true;
+  }
+}
+
+function recordHomeSplashShown() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem(SPLASH_LAST_SHOWN_KEY, String(Date.now()));
+  } catch {
+    // No-op when storage is unavailable.
+  }
+}
+
 // Lazy load heavy components
 const Writeups = lazy(() => import('./components/Writeups'));
+const Certifications = lazy(() => import('./components/Certifications'));
 const Projects = lazy(() => import('./components/Projects'));
 const About = lazy(() => import('./components/About'));
 const WriteupDetail = lazy(() => import('./components/WriteupDetail'));
@@ -34,27 +70,21 @@ const PageLoader = () => (
 
 // Main home page component
 function HomePage({ activeSection, setActiveSection }) {
-  const [triggerDecryption, setTriggerDecryption] = useState(false);
+  const initialShowSplash = useMemo(() => shouldShowHomeSplash(), []);
+  const [triggerDecryption, setTriggerDecryption] = useState(!initialShowSplash);
+  const [showSplash, setShowSplash] = useState(initialShowSplash);
 
-  const handleIntroComplete = () => {
+  const handleSplashComplete = () => {
+    recordHomeSplashShown();
+    setShowSplash(false);
     setTriggerDecryption(true);
   };
 
   return (
     <>
-      {/* Intro Video Component */}
-      <IntroVideo onIntroComplete={handleIntroComplete} />
+      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
 
-      {/* Full page letter glitch background */}
-      <div className="letter-glitch-background">
-        <LetterGlitch
-          glitchColors={['#0a0e27', '#54c1e6', '#1a1a2e']}
-          glitchSpeed={80}
-          centerVignette={false}
-          outerVignette={false}
-          smooth={true}
-        />
-      </div>
+
 
       <div className="terminal-frame">
         <Header activeSection={activeSection} setActiveSection={setActiveSection} />
@@ -64,6 +94,7 @@ function HomePage({ activeSection, setActiveSection }) {
             <Writeups />
             <Projects />
             <About />
+            <Certifications />
           </Suspense>
         </main>
         <Footer />
@@ -92,15 +123,7 @@ function WriteupPage({ activeSection, setActiveSection }) {
 
   return (
     <>
-      <div className="letter-glitch-background">
-        <LetterGlitch
-          glitchColors={['#0a0e27', '#54c1e6', '#1a1a2e']}
-          glitchSpeed={80}
-          centerVignette={false}
-          outerVignette={false}
-          smooth={true}
-        />
-      </div>
+
 
       <div className={`writeup-shell ${drawerOpen ? 'drawer-open' : 'drawer-collapsed'}`}>
         <WriteupDrawer isOpen={drawerOpen} onToggle={toggleDrawer} />
@@ -138,6 +161,7 @@ function App() {
 
   return (
     <Router>
+      <PixelBlast />
       <Helmet>
         <title>m3m0rydmp | Cyberpunk Portfolio</title>
         <meta name="description" content="Cybersecurity portfolio and writeups showcase featuring CTF solutions, pentesting reports, and security research." />

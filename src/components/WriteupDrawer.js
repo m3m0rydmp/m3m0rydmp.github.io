@@ -37,14 +37,14 @@ function WriteupDrawer({ isOpen = true, onToggle = () => { }, showToggle = true,
 
   const getIconPath = (iconName) => {
     const iconMap = {
-      github: '/icons/github.png',
-      linkedin: '/icons/linkedin.png',
-      hackthebox: '/icons/htb.jpeg',
-      tryhackme: '/icons/THM.png',
+      github: '/icons/github.webp',
+      linkedin: '/icons/linkedin.webp',
+      hackthebox: '/icons/htb.webp',
+      tryhackme: '/icons/THM.webp',
       resetsec: '/icons/resetsec.webp',
-      pwndesal: '/icons/pwndesal.jpg'
+      pwndesal: '/icons/pwndesal.webp'
     };
-    return iconMap[iconName] || '/icons/github.png';
+    return iconMap[iconName] || '/icons/github.webp';
   };
 
   const handleNavClick = (e, href) => {

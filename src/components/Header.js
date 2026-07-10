@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import config from '../config';
+import SearchBar from './SearchBar';
 import './Header.css';
 
 function Header({ activeSection, setActiveSection }) {
@@ -17,7 +18,7 @@ function Header({ activeSection, setActiveSection }) {
           return;
         }
       }
-      
+
       // Default to home if at very top
       setActiveSection('home');
     };
@@ -60,22 +61,26 @@ function Header({ activeSection, setActiveSection }) {
           <span className="bracket">]</span>
         </div>
 
-        <ul className="nav-links">
-          {config.navigation.links.map((link) => {
-            const sectionId = link.href.substring(1); // Remove # from href
-            return (
-              <li key={link.name}>
-                <a 
-                  href={link.href} 
-                  className={`nav-link ${activeSection === sectionId ? 'active' : ''}`}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                >
-                  {link.name}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="nav-controls">
+          <ul className="nav-links">
+            {config.navigation.links.map((link) => {
+              const sectionId = link.href.substring(1); // Remove # from href
+              return (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className={`nav-link ${activeSection === sectionId ? 'active' : ''}`}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+
+          <SearchBar customClass="header-search" />
+        </div>
       </nav>
     </header>
   );
