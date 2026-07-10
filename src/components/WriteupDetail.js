@@ -7,8 +7,15 @@ import rehypeSlug from 'rehype-slug';
 import GithubSlugger from 'github-slugger';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { ArrowUp, List, Lock, ShieldAlert } from 'lucide-react';
+import { ArrowUp, Ban, List, Lock, ShieldAlert } from 'lucide-react';
 import writeupsData from '../data/writeupsData.json';
+import {
+  loadGateState,
+  saveGateState,
+  clearGateState,
+  registerFailure,
+  gateStatus
+} from '../utils/lockoutGate';
 import './WriteupDetail.css';
 
 // Register languages for the syntax highlighter. PrismLight (not the full
@@ -155,10 +162,21 @@ function LockedWriteupPanel({ writeup, onUnlocked }) {
   const [keyInput, setKeyInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [denied, setDenied] = useState(false);
+  // Re-derived from localStorage on mount so an expired suspension (or a
+  // ban from a prior visit) is reflected immediately, before any attempt.
+  const [gate, setGate] = useState(() => {
+    const state = loadGateState();
+    return { status: gateStatus(state), state };
+  });
+
+  useEffect(() => {
+    const state = loadGateState();
+    setGate({ status: gateStatus(state), state });
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!keyInput || busy) return;
+    if (!keyInput || busy || gate.status !== 'open') return;
     setBusy(true);
     setDenied(false);
     try {
@@ -167,13 +185,42 @@ function LockedWriteupPanel({ writeup, onUnlocked }) {
       if (!response.ok) throw new Error('Unable to fetch encrypted datashard.');
       const payload = await response.json();
       const plaintext = await decryptLockedPayload(payload, keyInput);
+      clearGateState();
       onUnlocked(plaintext);
     } catch (error) {
-      setDenied(true);
+      const nextState = registerFailure(gate.state);
+      saveGateState(nextState);
+      const nextStatus = gateStatus(nextState);
+      setGate({ status: nextStatus, state: nextState });
+      if (nextStatus === 'open') setDenied(true);
     } finally {
       setBusy(false);
     }
   };
+
+  if (gate.status === 'banned') {
+    return (
+      <div className="locked-writeup-panel">
+        <div className="locked-writeup-icon locked-writeup-icon-banned">
+          <Ban size={40} />
+        </div>
+        <h2 className="locked-writeup-title">ENCRYPTED DATASHARD</h2>
+        <p className="locked-writeup-banned">ACCESS PERMANENTLY REVOKED</p>
+      </div>
+    );
+  }
+
+  if (gate.status === 'suspended') {
+    return (
+      <div className="locked-writeup-panel">
+        <div className="locked-writeup-icon locked-writeup-icon-suspended">
+          <ShieldAlert size={40} />
+        </div>
+        <h2 className="locked-writeup-title">ENCRYPTED DATASHARD</h2>
+        <p className="locked-writeup-suspended">ACCESS SUSPENDED</p>
+      </div>
+    );
+  }
 
   return (
     <div className="locked-writeup-panel">

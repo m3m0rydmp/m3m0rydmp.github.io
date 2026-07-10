@@ -625,6 +625,14 @@
   animation: locked-icon-glitch 0.4s steps(2, end) 2;
 }
 
+.locked-writeup-icon-suspended {
+  color: var(--cp-yellow);
+}
+
+.locked-writeup-icon-banned {
+  color: var(--cp-red);
+}
+
 .locked-writeup-title {
   font-family: var(--font-family);
   letter-spacing: 3px;
@@ -695,6 +703,26 @@
   letter-spacing: 1px;
   font-size: 0.85rem;
   margin-top: var(--spacing-sm);
+  animation: locked-text-glitch 0.3s linear;
+}
+
+.locked-writeup-suspended {
+  color: var(--cp-yellow);
+  font-family: var(--font-family);
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: var(--spacing-sm) 0 0;
+  animation: locked-text-glitch 0.3s linear;
+}
+
+.locked-writeup-banned {
+  color: var(--cp-red);
+  font-family: var(--font-family);
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: var(--spacing-sm) 0 0;
   animation: locked-text-glitch 0.3s linear;
 }
 
