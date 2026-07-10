@@ -14,6 +14,10 @@ const CATEGORY_ICONS = {
 
 const normalizeLabel = (value = '') => value.toLowerCase().replace(/[^a-z0-9]/g, '');
 
+// Escape regex metacharacters so user input can't throw (or inject a pattern)
+// when it's fed into `new RegExp(...)` for highlighting.
+const escapeRegExp = (value = '') => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 function getSnippet(content, query, contextLength = 40) {
     if (!content) return '';
     const matchIndex = content.toLowerCase().indexOf(query.toLowerCase());
@@ -114,7 +118,7 @@ function SearchBar({ platformFilter = null, customClass = '' }) {
 
     const highlightText = (text, highlight) => {
         if (!highlight.trim()) return text;
-        const regex = new RegExp(`(${highlight})`, 'gi');
+        const regex = new RegExp(`(${escapeRegExp(highlight)})`, 'gi');
         const parts = text.split(regex);
 
         return parts.map((part, i) =>

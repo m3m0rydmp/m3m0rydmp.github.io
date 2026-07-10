@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
@@ -392,8 +393,18 @@ function WriteupDetail() {
     return null;
   }
 
+  // writeup.excerpt comes from the static, build-time writeupsData.json — for
+  // the locked entry that's always the generic sidecar excerpt, never real
+  // decrypted content, regardless of the current unlock state below.
+  const pageDescription = writeup.excerpt || `${writeup.platform} writeup: ${writeup.title}`;
+
   return (
     <article className="writeup-detail-page">
+      <Helmet>
+        <title>{writeup.title} | m3m0rydmp</title>
+        <meta name="description" content={pageDescription} />
+      </Helmet>
+
       {status === 'loading' && <p className="status-line" style={{ padding: '2rem' }}>Initializing markdown parser…</p>}
       {status === 'error' && (
         <p className="status-line error" style={{ padding: '2rem' }}>Unable to load the markdown document. Please refresh and try again.</p>
@@ -448,8 +459,11 @@ function WriteupDetail() {
 
             <section className="writeup-detail">
               <div className="writeup-body">
-                <ReactMarkdown 
-                  remarkPlugins={[remarkGfm]} 
+                {/* rehype-raw is intentionally NOT used here — omitting it is
+                    what keeps raw HTML in markdown escaped/inert instead of
+                    rendered, which is the XSS guard for this renderer. */}
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeSlug]}
                   components={markdownComponents}
                 >

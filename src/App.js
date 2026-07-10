@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import ErrorPage from './components/ErrorPage';
+import ErrorBoundary from './components/ErrorBoundary';
 import SplashScreen from './components/SplashScreen';
 import WriteupDrawer from './components/WriteupDrawer';
 import PixelBlast from './components/PixelBlast';
@@ -63,7 +64,7 @@ const PageLoader = () => (
     justifyContent: 'center',
     alignItems: 'center',
     height: '50vh',
-    color: 'var(--primary-cyan)',
+    color: 'var(--cp-cyan)',
     fontFamily: 'var(--font-family)'
   }}>
     Decrypting...
@@ -92,12 +93,14 @@ function HomePage({ activeSection, setActiveSection }) {
         <Header activeSection={activeSection} setActiveSection={setActiveSection} />
         <main>
           <Hero triggerDecryption={triggerDecryption} />
-          <Suspense fallback={<PageLoader />}>
-            <Writeups />
-            <Projects />
-            <About />
-            <Certifications />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <Writeups />
+              <Projects />
+              <About />
+              <Certifications />
+            </Suspense>
+          </ErrorBoundary>
         </main>
         <Footer />
       </div>
@@ -148,9 +151,11 @@ function WriteupPage({ activeSection, setActiveSection }) {
         </button>
         <div className="writeup-content">
           <div className="writeup-content-inner">
-            <Suspense fallback={<PageLoader />}>
-              <WriteupDetail />
-            </Suspense>
+            <ErrorBoundary>
+              <Suspense fallback={<PageLoader />}>
+                <WriteupDetail />
+              </Suspense>
+            </ErrorBoundary>
           </div>
         </div>
       </div>
@@ -182,9 +187,11 @@ function App() {
         <Route
           path="/writeups/platform/:platform"
           element={
-            <Suspense fallback={<PageLoader />}>
-              <PlatformCategory />
-            </Suspense>
+            <ErrorBoundary>
+              <Suspense fallback={<PageLoader />}>
+                <PlatformCategory />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
 

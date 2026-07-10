@@ -18,7 +18,7 @@ function Projects() {
                 href={project.link}
                 className="project-title-link"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label={`Open ${project.title} repository`}
               >
                 {project.title}

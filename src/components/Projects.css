@@ -40,7 +40,7 @@
 }
 
 .project-title-link:hover {
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   border-bottom-color: rgba(84, 193, 230, 0.6);
 }
 
