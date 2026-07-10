@@ -15,12 +15,17 @@
 }
 
 .platform-sidebar {
-  position: sticky !important;
-  top: 0 !important;
+  position: sticky;
+  top: 0;
   align-self: flex-start;
   max-height: 100vh;
   max-height: 100dvh;
   overflow-y: auto;
+}
+
+.platform-category-shell .drawer-overlay,
+.platform-category-shell .drawer-floating-toggle {
+  display: none;
 }
 
 .platform-category-content {
@@ -405,8 +410,72 @@
   }
 
   .platform-sidebar {
-    position: relative;
+    position: fixed;
+    left: 0;
     top: 0;
+    bottom: 0;
+    width: 280px;
+    max-height: none;
+    height: 100dvh;
+    transform: translateX(-105%);
+    transition: transform var(--transition-normal);
+    z-index: 5;
+  }
+
+  .platform-category-shell.drawer-open .platform-sidebar {
+    transform: translateX(0);
+  }
+
+  .platform-category-shell .drawer-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+    z-index: 4;
+  }
+
+  .platform-category-shell.drawer-open .drawer-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .platform-category-shell .drawer-floating-toggle {
+    display: flex;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid rgba(84, 193, 230, 0.4);
+    background: rgba(5, 11, 24, 0.85);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 3px;
+    z-index: 6;
+    cursor: pointer;
+  }
+
+  .platform-category-shell .drawer-floating-toggle span {
+    width: 18px;
+    height: 2px;
+    background: var(--text-secondary);
+  }
+
+  .platform-category-shell .drawer-floating-toggle[data-state="open"] span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .platform-category-shell .drawer-floating-toggle[data-state="open"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .platform-category-shell .drawer-floating-toggle[data-state="open"] span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
   }
 }
 

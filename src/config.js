@@ -74,10 +74,10 @@ export const config = {
       },
       {
         id: 2,
-        title: "AISstream Vessel Tracker",
+        title: "Introspectre",
         icon: "/images/radar.webp",
-        description: "A Free Vessel Tracker that uses AISstream OpenAPI to track vessels",
-        link: "https://github.com/m3m0rydmp/AISstream-Vessel-Tracker"
+        description: "Automated tool to scan graphql endpoint and find some vulnerabilities",
+        link: "https://github.com/m3m0rydmp/Introspectre"
       },
       {
         id: 3,

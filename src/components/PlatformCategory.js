@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Lock } from 'lucide-react';
 import writeupsData from '../data/writeupsData.json';
@@ -42,6 +42,23 @@ function PlatformCategory() {
     });
   }, [normalizedPlatform]);
 
+  const [drawerOpen, setDrawerOpen] = useState(() => (
+    typeof window === 'undefined' ? true : window.innerWidth > 1024
+  ));
+
+  const toggleDrawer = () => setDrawerOpen((prev) => !prev);
+  const closeDrawer = () => setDrawerOpen(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeDrawer();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   if (!platformDef) {
     return <Navigate to="/" replace />;
   }
@@ -51,8 +68,25 @@ function PlatformCategory() {
 
   return (
     <div className="platform-category-page">
-      <div className="platform-category-shell">
-        <WriteupDrawer isOpen showToggle={false} className="platform-sidebar" />
+      <div className={`platform-category-shell ${drawerOpen ? 'drawer-open' : 'drawer-collapsed'}`}>
+        <WriteupDrawer isOpen={drawerOpen} onToggle={toggleDrawer} showToggle={false} className="platform-sidebar" />
+        <div
+          className="drawer-overlay"
+          aria-hidden="true"
+          onClick={drawerOpen ? closeDrawer : undefined}
+        ></div>
+        <button
+          type="button"
+          className="drawer-floating-toggle"
+          aria-label={drawerOpen ? 'Hide sidebar' : 'Show sidebar'}
+          aria-expanded={drawerOpen}
+          data-state={drawerOpen ? 'open' : 'closed'}
+          onClick={toggleDrawer}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
 
         <div className="platform-category-content">
           <div className="platform-category-header">
