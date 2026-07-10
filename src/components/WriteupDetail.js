@@ -123,16 +123,7 @@ function base64ToBytes(base64) {
   return bytes;
 }
 
-/**
- * Derives an AES-256-GCM key from a passphrase via PBKDF2-SHA256 and
- * decrypts the ciphertext produced by scripts/lockWriteup.js. This runs
- * entirely client-side (Web Crypto) — the site is static, so there is no
- * server to check the passphrase against; a wrong key simply fails GCM
- * authentication.
- * @param {{salt: string, iv: string, data: string, iter: number}} payload
- * @param {string} passphrase
- * @returns {Promise<string>} decrypted UTF-8 markdown
- */
+// Web Crypto decrypt for the gated writeup payload.
 async function decryptLockedPayload(payload, passphrase) {
   const salt = base64ToBytes(payload.salt);
   const iv = base64ToBytes(payload.iv);
@@ -162,8 +153,6 @@ function LockedWriteupPanel({ writeup, onUnlocked }) {
   const [keyInput, setKeyInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [denied, setDenied] = useState(false);
-  // Re-derived from localStorage on mount so an expired suspension (or a
-  // ban from a prior visit) is reflected immediately, before any attempt.
   const [gate, setGate] = useState(() => {
     const state = loadGateState();
     return { status: gateStatus(state), state };
@@ -278,10 +267,6 @@ function WriteupDetail() {
     return segments.join('/');
   }, [writeup]);
 
-  /**
-   * @time O(n) where n is number of lines in content (max 20 metadata-scanned)
-   * @space O(n) for contentLines array copy
-   */
   const processedContent = useMemo(() => {
     if (!content) return { markdown: '', metadata: null, toc: [] };
 
@@ -392,9 +377,7 @@ function WriteupDetail() {
     };
   }, [assetBase]);
 
-  // Memoize the rendered markdown so unrelated re-renders (e.g. the scroll
-  // handler toggling showScrollTop) don't reconcile the markdown subtree —
-  // that would strip the <mark> the highlight effect injects into the DOM.
+  // Memoized so unrelated re-renders don't strip the injected search mark.
   const markdownElement = useMemo(() => (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}

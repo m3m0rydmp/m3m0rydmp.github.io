@@ -28,11 +28,7 @@ const DEFAULT_META = {
 
 const MAX_PARAGRAPH_SCAN = 12;
 
-/**
- * @time O(n)
- * @space O(1)
- * Copies the writeups directory and builds metadata for each markdown file.
- */
+// Copies the writeups directory and builds metadata for each markdown file.
 async function main() {
   try {
     await fs.access(SOURCE_DIR);
@@ -85,10 +81,8 @@ async function main() {
     });
   }
 
-  // Locked writeups: folders that ship only ciphertext (content.enc) + a
-  // non-secret sidecar (meta.json). No plaintext exists on disk for these,
-  // so they are intentionally excluded from collectMarkdownFiles above and
-  // from searchRecords below (no content to leak into the search index).
+  // Locked writeups ship only ciphertext (content.enc) + a meta.json sidecar;
+  // they are handled separately from the plaintext markdown collected above.
   const lockedDirs = await collectLockedDirs(SOURCE_DIR);
   for (const dirPath of lockedDirs) {
     const relativePath = normalizeRelativePath(path.relative(SOURCE_DIR, dirPath));
@@ -118,7 +112,7 @@ async function main() {
       wordCount: 0,
       locked: true
     });
-    // Intentionally NOT pushed to searchRecords — no plaintext to index.
+    // Not added to the search index.
   }
 
   records.sort((a, b) => {
@@ -141,12 +135,7 @@ async function main() {
   );
 }
 
-/**
- * Recursively copies a directory while preserving structure.
- * Maximum depth equals the nested folder depth inside /writeups (typically < 6), preventing stack overflows.
- * @param {string} src
- * @param {string} dest
- */
+// Recursively copies a directory, preserving structure.
 async function copyDirectory(src, dest) {
   await fs.mkdir(dest, { recursive: true });
   const entries = await fs.readdir(src, { withFileTypes: true });
@@ -166,12 +155,7 @@ async function copyDirectory(src, dest) {
   }
 }
 
-/**
- * Gathers markdown files from a directory tree.
- * Depth is bounded by the writeups folder structure (<< 1k directories), so recursion is safe.
- * @param {string} dir
- * @returns {Promise<string[]>}
- */
+// Gathers markdown files from a directory tree.
 async function collectMarkdownFiles(dir) {
   const results = [];
   const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -192,12 +176,7 @@ async function collectMarkdownFiles(dir) {
   return results;
 }
 
-/**
- * Finds directories that contain both `content.enc` and `meta.json` —
- * i.e. locked/password-gated writeups with no plaintext markdown on disk.
- * @param {string} dir
- * @returns {Promise<string[]>}
- */
+// Finds directories containing both content.enc and meta.json (locked writeups).
 async function collectLockedDirs(dir) {
   const results = [];
   const entries = await fs.readdir(dir, { withFileTypes: true });

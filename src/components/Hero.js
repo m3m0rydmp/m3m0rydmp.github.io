@@ -183,7 +183,7 @@ function Hero({ triggerDecryption = false }) {
               }
             }}
           />
-          <span className="profile-credit" aria-hidden="true">Art by Anthony Montecillo</span>
+          <span className="profile-credit" aria-hidden="true">Art by _chocosmonaught_</span>
         </div>
 
       </div>

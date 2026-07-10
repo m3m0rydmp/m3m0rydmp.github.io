@@ -30,10 +30,6 @@ function PlatformCategory() {
   const normalizedPlatform = normalizeLabel(platform);
   const platformDef = PLATFORM_DEFINITIONS[normalizedPlatform];
 
-  /**
-   * @time O(n) where n is total writeups
-   * @space O(k) where k is filtered writeups for this platform
-   */
   const items = useMemo(() => {
     const allItems = writeupsData.items ?? [];
     return allItems.filter((writeup) => {

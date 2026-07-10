@@ -54,10 +54,6 @@ const CATEGORY_ICONS = {
 function Writeups() {
   const items = useMemo(() => writeupsData.items ?? [], []);
 
-  /**
-   * @time O(n * m) where n is writeups, m is platform sections (typically <10)
-   * @space O(n) for grouped sections with references
-   */
   const groupedSections = useMemo(() => {
     const claimedIds = new Set();
 

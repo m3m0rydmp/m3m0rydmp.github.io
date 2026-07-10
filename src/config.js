@@ -1,9 +1,4 @@
-/**
- * SITE CONFIGURATION FILE
- * =====================
- * Centralized configuration for all site content, links, and details.
- * Edit this file to update your portfolio information across the entire site.
- */
+// Site configuration: content, links, and profile details.
 
 export const config = {
   // ========== SITE METADATA ==========

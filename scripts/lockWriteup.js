@@ -1,22 +1,9 @@
 #!/usr/bin/env node
 /**
- * One-time encryption utility for publishing a password-gated writeup on a
- * static (GitHub Pages) site. There is no backend, so this performs genuine
- * client-side-compatible encryption at import time: the ciphertext is what
- * ships, and the passphrase is never stored anywhere.
+ * Encrypts a writeup for the gated reader (PBKDF2-SHA256 + AES-256-GCM),
+ * writing a content.enc compatible with window.crypto.subtle.decrypt.
  *
- * Crypto design: PBKDF2-SHA256 (>=210000 iterations, random 16-byte salt)
- * derives an AES-256-GCM key from the passphrase. The GCM auth tag is
- * appended to the ciphertext bytes (tag || ciphertext order matches what
- * Node produces via cipher.getAuthTag(), concatenated after the ciphertext)
- * so the payload is directly compatible with window.crypto.subtle.decrypt,
- * which expects the tag appended to the end of the ciphertext buffer.
- *
- * Usage:
- *   node scripts/lockWriteup.js <input.md> <output-dir> <passphrase>
- *
- * The passphrase MUST be passed as a CLI argument and must never be
- * hardcoded here or written to any committed file, comment, or log.
+ * Usage: node scripts/lockWriteup.js <input.md> <output-dir> <passphrase>
  */
 
 const { promises: fs } = require('fs');
