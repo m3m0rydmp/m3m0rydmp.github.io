@@ -4,20 +4,6 @@
   max-width: 640px;
 }
 
-.platform-flag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.15rem 0.65rem;
-  border-radius: 999px;
-  border: 1px solid rgba(254, 232, 1, 0.5);
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  background: rgba(254, 232, 1, 0.08);
-  color: #fee801;
-}
-
 .platform-tile-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -107,7 +93,7 @@
 }
 
 .platform-tile:hover {
-  border-color: var(--primary-cyan);
+  border-color: var(--cp-cyan);
   transform: translate3d(0, -4px, 0);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(84, 193, 230, 0.16);
 }
@@ -208,7 +194,7 @@
 }
 
 .placeholder-eyebrow {
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-family);
   color: #fee801;
   text-transform: uppercase;
   letter-spacing: 0.3em;
@@ -230,46 +216,6 @@
 .writeups-placeholder.selection-hint {
   padding: var(--spacing-lg);
   text-align: left;
-}
-
-
-.difficulty {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: var(--font-size-sm);
-  font-weight: bold;
-  border: 1px solid;
-  text-transform: uppercase;
-}
-
-.difficulty.easy {
-  background-color: rgba(57, 255, 20, 0.1);
-  color: var(--accent-green);
-  border-color: rgba(57, 255, 20, 0.3);
-}
-
-.difficulty.medium {
-  background-color: rgba(255, 215, 0, 0.1);
-  color: #ffd700;
-  border-color: rgba(255, 215, 0, 0.3);
-}
-
-.difficulty.hard {
-  background-color: rgba(255, 0, 110, 0.1);
-  color: var(--primary-magenta);
-  border-color: rgba(255, 0, 110, 0.3);
-}
-
-.difficulty.insane {
-  background-color: rgba(160, 0, 255, 0.1);
-  color: var(--primary-purple);
-  border-color: rgba(160, 0, 255, 0.3);
-}
-
-.difficulty.unknown {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
-  border-color: rgba(255, 255, 255, 0.2);
 }
 
 @media (max-width: 768px) {

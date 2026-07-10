@@ -46,7 +46,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   text-decoration: none;
   transition: all var(--transition-normal);
   padding: var(--spacing-sm) var(--spacing-md);
@@ -64,7 +64,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: var(--primary-cyan);
+  background: var(--cp-cyan);
   transition: width var(--transition-normal);
   z-index: -1;
 }
@@ -100,7 +100,7 @@
   position: absolute;
   bottom: var(--spacing-md);
   right: var(--spacing-lg);
-  color: var(--accent-green);
+  color: var(--cp-teal);
   animation: cursor-blink 1s infinite;
   font-weight: bold;
 }

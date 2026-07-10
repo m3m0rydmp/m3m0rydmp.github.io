@@ -26,7 +26,7 @@
 }
 
 .cert-kicker {
-    color: var(--primary-cyan);
+    color: var(--cp-cyan);
     text-transform: uppercase;
     letter-spacing: 2.5px;
     font-size: 0.88rem;
@@ -113,8 +113,8 @@
 }
 
 .cert-tab.active .cert-tab-signal {
-    background: var(--primary-cyan);
-    border-color: var(--primary-cyan);
+    background: var(--cp-cyan);
+    border-color: var(--cp-cyan);
     box-shadow: 0 0 14px rgba(84, 193, 230, 0.85);
 }
 
@@ -130,7 +130,7 @@
 }
 
 .cert-group-head h3 {
-    color: var(--primary-cyan);
+    color: var(--cp-cyan);
     margin-bottom: 0.4rem;
     letter-spacing: 1px;
 }
@@ -208,7 +208,7 @@
     border-radius: 8px;
     padding: 0.4rem 0.65rem;
     background: rgba(84, 193, 230, 0.08);
-    color: var(--primary-cyan);
+    color: var(--cp-cyan);
     font-family: var(--font-family);
     font-size: 0.8rem;
     cursor: pointer;
@@ -291,7 +291,7 @@
 }
 
 .cert-modal-info h3 {
-    color: var(--primary-cyan);
+    color: var(--cp-cyan);
     margin-bottom: 5px;
     font-size: 1.5rem;
 }

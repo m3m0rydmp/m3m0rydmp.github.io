@@ -5,6 +5,7 @@
   "homepage": "https://m3m0rydmp.github.io",
   "private": true,
   "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.2.8",
     "caniuse-lite": "^1.0.30001788",
     "github-slugger": "^2.0.0",
     "lucide-react": "^0.554.0",

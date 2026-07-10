@@ -1,5 +1,6 @@
 .hero {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,11 +26,11 @@
   margin-bottom: var(--spacing-md);
   position: relative;
   line-height: 1.1;
-  color: var(--primary-cyan);
-  text-shadow: 0 0 10px var(--primary-cyan);
+  color: var(--cp-cyan);
+  text-shadow: 0 0 10px var(--cp-cyan);
   display: inline-block;
   padding: 0 5px;
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-family);
 }
 
 /* Glitch loop animation (continuous) - inspired by CodePen VwprebG */
@@ -70,8 +71,8 @@
     glitch-opacity 5s step-end infinite,
     glitch-font-magenta 8s step-end infinite,
     glitch-movement 10s step-end infinite;
-  color: var(--primary-magenta);
-  text-shadow: 0 0 15px var(--primary-magenta);
+  color: var(--cp-yellow);
+  text-shadow: 0 0 15px var(--cp-yellow);
   top: 10px;
   left: 15px;
 }
@@ -81,8 +82,8 @@
     glitch-opacity 5s step-end infinite,
     glitch-font-cyan 7s step-end infinite,
     glitch-movement 8s step-end infinite;
-  color: var(--primary-cyan);
-  text-shadow: 0 0 15px var(--primary-cyan);
+  color: var(--cp-cyan);
+  text-shadow: 0 0 15px var(--cp-cyan);
   top: 5px;
   left: -10px;
 }
@@ -217,16 +218,16 @@
 @keyframes glitch-font-magenta {
   0% {
     font-weight: 100;
-    color: var(--primary-magenta);
+    color: var(--cp-yellow);
     filter: blur(3px);
-    text-shadow: 0 0 20px var(--primary-magenta);
+    text-shadow: 0 0 20px var(--cp-yellow);
   }
 
   20% {
     font-weight: 500;
-    color: var(--primary-magenta);
+    color: var(--cp-yellow);
     filter: blur(0);
-    text-shadow: 0 0 15px var(--primary-magenta);
+    text-shadow: 0 0 15px var(--cp-yellow);
   }
 
   50% {
@@ -238,16 +239,16 @@
 
   60% {
     font-weight: 700;
-    color: var(--primary-magenta);
+    color: var(--cp-yellow);
     filter: blur(0);
-    text-shadow: 0 0 15px var(--primary-magenta);
+    text-shadow: 0 0 15px var(--cp-yellow);
   }
 
   90% {
     font-weight: 500;
-    color: var(--primary-magenta);
+    color: var(--cp-yellow);
     filter: blur(6px);
-    text-shadow: 0 0 25px var(--primary-magenta);
+    text-shadow: 0 0 25px var(--cp-yellow);
   }
 }
 
@@ -255,16 +256,16 @@
 @keyframes glitch-font-cyan {
   0% {
     font-weight: 100;
-    color: var(--primary-cyan);
+    color: var(--cp-cyan);
     filter: blur(3px);
-    text-shadow: 0 0 20px var(--primary-cyan);
+    text-shadow: 0 0 20px var(--cp-cyan);
   }
 
   20% {
     font-weight: 500;
-    color: var(--primary-cyan);
+    color: var(--cp-cyan);
     filter: blur(0);
-    text-shadow: 0 0 15px var(--primary-cyan);
+    text-shadow: 0 0 15px var(--cp-cyan);
   }
 
   50% {
@@ -276,22 +277,22 @@
 
   60% {
     font-weight: 700;
-    color: var(--primary-cyan);
+    color: var(--cp-cyan);
     filter: blur(0);
-    text-shadow: 0 0 15px var(--primary-cyan);
+    text-shadow: 0 0 15px var(--cp-cyan);
   }
 
   90% {
     font-weight: 500;
-    color: var(--primary-cyan);
+    color: var(--cp-cyan);
     filter: blur(6px);
-    text-shadow: 0 0 25px var(--primary-cyan);
+    text-shadow: 0 0 25px var(--cp-cyan);
   }
 }
 
 .subtitle {
   font-size: var(--font-size-lg);
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   margin-bottom: var(--spacing-md);
   display: flex;
   align-items: center;
@@ -303,7 +304,7 @@
 .cursor {
   width: 2px;
   height: 1.2em;
-  background-color: var(--primary-cyan);
+  background-color: var(--cp-cyan);
   animation: cursor-blink 1s infinite;
 }
 
@@ -358,7 +359,7 @@
   padding: 0.35rem 0.65rem;
   font-size: 0.72rem;
   letter-spacing: 0.7px;
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   background: rgba(4, 12, 24, 0.92);
   border: 1px solid rgba(84, 193, 230, 0.5);
   border-radius: 999px;
@@ -372,7 +373,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: 3px solid var(--primary-cyan);
+  border: 3px solid var(--cp-cyan);
   border-radius: 8px;
   box-shadow:
     0 0 20px rgba(84, 193, 230, 0.3),
@@ -384,8 +385,8 @@
   box-shadow:
     0 0 30px rgba(84, 193, 230, 0.5),
     inset 0 0 30px rgba(84, 193, 230, 0.2),
-    -2px 2px 0 var(--primary-magenta),
-    2px -2px 0 var(--primary-purple);
+    -2px 2px 0 var(--cp-yellow),
+    2px -2px 0 var(--cp-teal);
   transform: scale(1.02);
 }
 
@@ -410,11 +411,11 @@
   right: -50px;
   bottom: 20%;
   font-size: var(--font-size-2xl);
-  color: var(--accent-green);
+  color: var(--cp-teal);
   letter-spacing: 3px;
   opacity: 0.3;
   animation: float 6s ease-in-out infinite;
-  text-shadow: 0 0 15px var(--accent-green);
+  text-shadow: 0 0 15px var(--cp-teal);
 }
 
 

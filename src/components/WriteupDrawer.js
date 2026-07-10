@@ -15,18 +15,39 @@ function WriteupDrawer({ isOpen = true, onToggle = () => { }, showToggle = true,
   const isWriteupDetailPage = location.pathname.startsWith('/writeups/') &&
     !location.pathname.startsWith('/writeups/platform/');
 
-  const currentPlatform = React.useMemo(() => {
-    if (!isWriteupDetailPage) return null;
+  const isPlatformListPage = location.pathname.startsWith('/writeups/platform/');
 
-    const pathParts = location.pathname.split('/');
-    const slug = pathParts[pathParts.length - 1];
-    const writeup = writeupsData.items?.find(item => item.slug === slug);
+  const currentPlatformInfo = React.useMemo(() => {
+    if (isWriteupDetailPage) {
+      const pathParts = location.pathname.split('/');
+      const slug = pathParts[pathParts.length - 1];
+      const writeup = writeupsData.items?.find(item => item.slug === slug);
 
-    if (writeup && writeup.platform) {
-      return writeup.platform.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (writeup && writeup.platform) {
+        return {
+          slug: writeup.platform.toLowerCase().replace(/[^a-z0-9]/g, ''),
+          label: writeup.platform,
+        };
+      }
+      return null;
     }
+
+    if (isPlatformListPage) {
+      const pathParts = location.pathname.split('/');
+      const platformSlug = pathParts[pathParts.length - 1];
+      const writeup = writeupsData.items?.find(
+        item => item.platform && item.platform.toLowerCase().replace(/[^a-z0-9]/g, '') === platformSlug
+      );
+      return { slug: platformSlug, label: writeup?.platform || platformSlug };
+    }
+
     return null;
-  }, [location.pathname, isWriteupDetailPage]);
+  }, [location.pathname, isWriteupDetailPage, isPlatformListPage]);
+
+  const currentPlatform = currentPlatformInfo?.slug ?? null;
+  const footerLabel = currentPlatformInfo?.label
+    ? `${currentPlatformInfo.label} writeups`
+    : '// writeup index';
 
   const handleBackToPlatform = (e) => {
     e.preventDefault();
@@ -131,7 +152,7 @@ function WriteupDrawer({ isOpen = true, onToggle = () => { }, showToggle = true,
               ) : null
             ))}
         </div>
-        <p className="drawer-handle">Hack The Box writeups</p>
+        <p className="drawer-handle">{footerLabel}</p>
       </div>
     </aside>
   );

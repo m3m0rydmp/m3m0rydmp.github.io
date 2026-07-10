@@ -3,23 +3,43 @@
    ================================================================ */
 
 :root {
-  /* Primary Colors - Cyberpunk 2077 Palette */
-  --primary-cyan: #54c1e6;
-  --primary-magenta: #fee801;
-  --primary-purple: #9a9f17;
-  --accent-green: #39c4b6;
+  /* Primary Colors - Cyberpunk 2077 Palette (semantically named) */
+  --cp-yellow: #fee801;
+  --cp-cyan: #54c1e6;
+  --cp-teal: #39c4b6;
+  --cp-red: #ff4d6d;
+
+  /* RGB triplets for rgba() glows */
+  --cp-cyan-rgb: 84, 193, 230;
+  --cp-yellow-rgb: 254, 232, 1;
+  --cp-teal-rgb: 57, 196, 182;
+  --cp-red-rgb: 255, 77, 109;
+
+  /* Difficulty scale (single source of truth — consumed by Writeups.css,
+     PlatformCategory.css, WriteupDetail.css). Values match the former
+     PlatformCategory scale, the most legible of the three that existed. */
+  --diff-very-easy: #73ffba;
+  --diff-very-easy-rgb: 115, 255, 186;
+  --diff-easy: #b4ff9f;
+  --diff-easy-rgb: 180, 255, 159;
+  --diff-medium: #ffb347;
+  --diff-medium-rgb: 255, 179, 71;
+  --diff-hard: #b88cff;
+  --diff-hard-rgb: 184, 140, 255;
+  --diff-insane: #ff4d6d;
+  --diff-insane-rgb: 255, 77, 109;
 
   /* Neutrals */
   --dark-bg: #00060e;
   --darker-bg: #000000;
   --darker-bg-alt: #0a0c15;
-  --text-primary: #fee801;
-  --text-secondary: #54c1e6;
-  --text-muted: #39c4b6;
+  --text-primary: var(--cp-yellow);
+  --text-secondary: var(--cp-cyan);
+  --text-muted: var(--cp-teal);
 
   /* Borders & Accents */
   --border-color: #1a1f2e;
-  --border-glow: #54c1e6;
+  --border-glow: var(--cp-cyan);
 
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -29,7 +49,7 @@
   --spacing-xl: 3rem;
 
   /* Typography */
-  --font-family: 'Courier New', 'JetBrains Mono', monospace;
+  --font-family: 'JetBrains Mono', 'Courier New', monospace;
   --font-size-base: 1rem;
   --font-size-sm: 0.875rem;
   --font-size-lg: 1.125rem;
@@ -74,6 +94,7 @@ body {
 #root {
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Scanline Effect */
@@ -149,7 +170,7 @@ body::before {
   font-weight: 900;
   letter-spacing: 2px;
   margin-bottom: var(--spacing-md);
-  background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
+  background: linear-gradient(135deg, var(--cp-cyan), var(--cp-teal));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -158,8 +179,8 @@ body::before {
 .title-underline {
   width: 100px;
   height: 3px;
-  background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
-  box-shadow: 0 0 10px var(--primary-cyan);
+  background: linear-gradient(135deg, var(--cp-cyan), var(--cp-teal));
+  box-shadow: 0 0 10px var(--cp-cyan);
 }
 
 /* ================================================================
@@ -194,34 +215,34 @@ body::before {
 }
 
 .btn-primary {
-  color: var(--primary-cyan);
-  border-color: var(--primary-cyan);
-  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.3), 0 0 10px rgba(0, 240, 255, 0.3);
+  color: var(--cp-cyan);
+  border-color: var(--cp-cyan);
+  box-shadow: inset 0 0 10px rgba(var(--cp-cyan-rgb), 0.3), 0 0 10px rgba(var(--cp-cyan-rgb), 0.3);
 }
 
 .btn-primary::before {
-  background: var(--primary-cyan);
+  background: var(--cp-cyan);
 }
 
 .btn-primary:hover {
   color: var(--dark-bg);
-  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.5);
+  box-shadow: inset 0 0 20px rgba(var(--cp-cyan-rgb), 0.5), 0 0 20px rgba(var(--cp-cyan-rgb), 0.5);
   left: 0;
 }
 
 .btn-secondary {
-  color: var(--primary-magenta);
-  border-color: var(--primary-magenta);
-  box-shadow: inset 0 0 10px rgba(255, 0, 110, 0.3), 0 0 10px rgba(255, 0, 110, 0.3);
+  color: var(--cp-yellow);
+  border-color: var(--cp-yellow);
+  box-shadow: inset 0 0 10px rgba(var(--cp-yellow-rgb), 0.3), 0 0 10px rgba(var(--cp-yellow-rgb), 0.3);
 }
 
 .btn-secondary::before {
-  background: var(--primary-magenta);
+  background: var(--cp-yellow);
 }
 
 .btn-secondary:hover {
   color: var(--dark-bg);
-  box-shadow: inset 0 0 20px rgba(255, 0, 110, 0.5), 0 0 20px rgba(255, 0, 110, 0.5);
+  box-shadow: inset 0 0 20px rgba(var(--cp-yellow-rgb), 0.5), 0 0 20px rgba(var(--cp-yellow-rgb), 0.5);
   left: 0;
 }
 
@@ -263,44 +284,44 @@ body::before {
 @keyframes glitch-effect {
   0% {
     text-shadow:
-      0 0 10px var(--primary-cyan),
-      -2px 2px 0 var(--primary-magenta),
-      2px -2px 0 var(--primary-purple);
+      0 0 10px var(--cp-cyan),
+      -2px 2px 0 var(--cp-yellow),
+      2px -2px 0 var(--cp-teal);
   }
 
   20% {
     text-shadow:
-      0 0 10px var(--primary-cyan),
-      -2px 2px 0 var(--primary-purple),
-      2px -2px 0 var(--primary-magenta);
+      0 0 10px var(--cp-cyan),
+      -2px 2px 0 var(--cp-teal),
+      2px -2px 0 var(--cp-yellow);
   }
 
   40% {
     text-shadow:
-      0 0 10px var(--primary-cyan),
-      2px 2px 0 var(--primary-magenta),
-      -2px -2px 0 var(--primary-purple);
+      0 0 10px var(--cp-cyan),
+      2px 2px 0 var(--cp-yellow),
+      -2px -2px 0 var(--cp-teal);
   }
 
   60% {
     text-shadow:
-      0 0 10px var(--primary-cyan),
-      -2px -2px 0 var(--primary-purple),
-      2px 2px 0 var(--primary-magenta);
+      0 0 10px var(--cp-cyan),
+      -2px -2px 0 var(--cp-teal),
+      2px 2px 0 var(--cp-yellow);
   }
 
   80% {
     text-shadow:
-      0 0 10px var(--primary-cyan),
-      2px -2px 0 var(--primary-magenta),
-      -2px 2px 0 var(--primary-purple);
+      0 0 10px var(--cp-cyan),
+      2px -2px 0 var(--cp-yellow),
+      -2px 2px 0 var(--cp-teal);
   }
 
   100% {
     text-shadow:
-      0 0 10px var(--primary-cyan),
-      -2px 2px 0 var(--primary-magenta),
-      2px -2px 0 var(--primary-purple);
+      0 0 10px var(--cp-cyan),
+      -2px 2px 0 var(--cp-yellow),
+      2px -2px 0 var(--cp-teal);
   }
 }
 
