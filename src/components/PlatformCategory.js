@@ -1,10 +1,19 @@
 import React, { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
+import { Lock } from 'lucide-react';
 import writeupsData from '../data/writeupsData.json';
 import WriteupDrawer from './WriteupDrawer';
 import SearchBar from './SearchBar';
-import BorderGlow from './BorderGlow';
 import './PlatformCategory.css';
+
+function osTagFor(os) {
+  const normalized = (os || '').toLowerCase();
+  if (normalized.includes('win')) return 'WIN';
+  if (normalized.includes('lin')) return 'LIN';
+  if (normalized.includes('mac') || normalized.includes('osx')) return 'MAC';
+  if (!os || normalized === 'n/a') return 'N/A';
+  return os.toUpperCase();
+}
 
 const PLATFORM_DEFINITIONS = {
   hackthebox: { label: 'Hack The Box', badge: 'HTB', logo: '/icons/htb.webp', description: 'Machines, challenges, sherlocks, and labs' },
@@ -73,59 +82,70 @@ function PlatformCategory() {
               </div>
             </div>
           ) : (
-            <div className="platform-writeup-grid">
-              {items.map((writeup) => {
-                const difficultyNormalized = (writeup.difficulty || 'unknown').toLowerCase().replace(/\s+/g, '-');
-                const difficultyLabel = writeup.difficulty ? writeup.difficulty.toUpperCase() : 'UNKNOWN';
+            <>
+              <div className="platform-database-header">
+                <span className="database-header-tag">{'// DATABASE:'}</span>{' '}
+                {platformDef.label.toUpperCase()} — {items.length} RECORD{items.length === 1 ? '' : 'S'}
+              </div>
 
-                const categoryNormalized = (writeup.category || '').toLowerCase();
-                let categoryClass = '';
-                if (categoryNormalized.includes('offensive') || categoryNormalized.includes('red')) {
-                  categoryClass = 'offensive';
-                } else if (categoryNormalized.includes('defensive') || categoryNormalized.includes('blue')) {
-                  categoryClass = 'defensive';
-                }
-
-                return (
-                  <BorderGlow
-                    key={writeup.id}
-                    className="platform-card-glow"
-                    edgeSensitivity={34}
-                    glowColor="188 68 62"
-                    backgroundColor="#0a0e27"
-                    borderRadius={14}
-                    glowRadius={34}
-                    glowIntensity={1.0}
-                    coneSpread={24}
-                    animated={false}
-                    colors={['#2f9ac2', '#54c1e6', '#39c4b6']}
-                    fillOpacity={0.3}
-                  >
-                    <Link
-                      to={`/writeups/${writeup.slug}`}
-                      className="platform-card"
-                    >
-                      {writeup.coverImage && (
-                        <div className="platform-card-image" style={{ backgroundImage: `url(${writeup.coverImage})` }}>
-                          <div className="platform-card-image-overlay"></div>
+              <div className="writeup-row-list" role="list">
+                {items.map((writeup) => {
+                  if (writeup.locked) {
+                    return (
+                      <Link
+                        key={writeup.id}
+                        to={`/writeups/${writeup.slug}`}
+                        className="writeup-row writeup-row-locked"
+                        role="listitem"
+                      >
+                        <span className="row-marker" aria-hidden="true"></span>
+                        <div className="row-main">
+                          <div className="row-title-line">
+                            <span className="row-title">{writeup.title}</span>
+                            <span className="row-locked-badge">
+                              <Lock size={11} aria-hidden="true" /> [ENCRYPTED]
+                            </span>
+                          </div>
+                          <div className="row-meta-line">
+                            <span className="row-excerpt">{writeup.excerpt || 'ENCRYPTED // ACCESS RESTRICTED'}</span>
+                          </div>
                         </div>
-                      )}
-                      <div className="platform-card-header">
-                        <p className="platform-card-date"><span className="bracket">[</span> {writeup.displayDate} <span className="bracket">]</span></p>
-                      </div>
-                      <div className="platform-card-body">
-                        <h4>{writeup.title}</h4>
-                        <p className="platform-card-excerpt">{writeup.excerpt || 'No description available for this writeup.'}</p>
-                      </div>
-                      <div className="platform-card-footer">
-                        <span className={`platform-pill difficulty ${difficultyNormalized}`}>{difficultyLabel}</span>
-                        <span className={`platform-pill category-pill ${categoryClass}`}>{writeup.category}</span>
+                      </Link>
+                    );
+                  }
+
+                  const difficultyNormalized = (writeup.difficulty || 'unknown').toLowerCase().replace(/\s+/g, '-');
+                  const difficultyLabel = writeup.difficulty ? writeup.difficulty.toUpperCase() : 'UNKNOWN';
+                  const osTag = osTagFor(writeup.os);
+                  const tagsLine = writeup.tags && writeup.tags.length > 0
+                    ? writeup.tags.join(' · ')
+                    : (writeup.category || 'Uncategorized');
+
+                  return (
+                    <Link
+                      key={writeup.id}
+                      to={`/writeups/${writeup.slug}`}
+                      className="writeup-row"
+                      role="listitem"
+                    >
+                      <span className="row-marker" aria-hidden="true"></span>
+                      <div className="row-main">
+                        <div className="row-title-line">
+                          <span className="row-title">{writeup.title}</span>
+                          <span className={`row-pill difficulty ${difficultyNormalized}`}>[{difficultyLabel}]</span>
+                          <span className="row-os">{osTag}</span>
+                          <span className="row-date">{writeup.displayDate}</span>
+                        </div>
+                        <div className="row-meta-line">
+                          <span className="row-tags">{tagsLine}</span>
+                          <span className="row-readtime">{writeup.readTime}</span>
+                        </div>
                       </div>
                     </Link>
-                  </BorderGlow>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       </div>
