@@ -178,7 +178,7 @@ function SearchBar({ platformFilter = null, customClass = '' }) {
                                     key={result.id}
                                     className="search-result-item"
                                     onClick={() => {
-                                        navigate(`/writeups/${result.slug}`);
+                                        navigate(`/writeups/${result.slug}?q=${encodeURIComponent(query)}`);
                                         setIsActive(false);
                                     }}
                                 >

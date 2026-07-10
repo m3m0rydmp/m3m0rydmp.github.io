@@ -711,3 +711,57 @@
   50% { opacity: 1; transform: translateX(3px); }
   100% { opacity: 1; transform: translateX(0); }
 }
+
+/* ================================================================
+   SEARCH JUMP HIGHLIGHT
+   Applied to the first occurrence of a searched keyword when the user
+   arrives from a search result (WriteupDetail.js injects the <mark>).
+   ================================================================ */
+.search-jump-highlight {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 0 0.15em;
+  color: #050b18;
+  background: rgba(var(--cp-yellow-rgb), 0.28);
+  transform-origin: center;
+  /* Settled state persists after the pulse so the keyword stays spottable. */
+  box-shadow: 0 0 0 1px rgba(var(--cp-yellow-rgb), 0.45);
+  animation: search-jump-pulse 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes search-jump-pulse {
+  0% {
+    transform: scale(1);
+    background: transparent;
+    color: inherit;
+    box-shadow: 0 0 0 0 rgba(var(--cp-yellow-rgb), 0);
+    text-shadow: none;
+  }
+  25% {
+    transform: scale(1.32);
+    background: var(--cp-yellow);
+    color: #050b18;
+    box-shadow: 0 0 26px 6px rgba(var(--cp-yellow-rgb), 0.85);
+    text-shadow: 0 0 12px rgba(var(--cp-cyan-rgb), 0.6);
+  }
+  55% {
+    transform: scale(1.32);
+    background: var(--cp-yellow);
+    color: #050b18;
+    box-shadow: 0 0 26px 6px rgba(var(--cp-yellow-rgb), 0.85);
+  }
+  100% {
+    transform: scale(1);
+    background: rgba(var(--cp-yellow-rgb), 0.28);
+    color: #050b18;
+    box-shadow: 0 0 0 1px rgba(var(--cp-yellow-rgb), 0.45);
+    text-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-jump-highlight {
+    animation: none;
+    transform: none;
+  }
+}

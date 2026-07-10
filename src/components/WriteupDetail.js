@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -205,6 +205,7 @@ function LockedWriteupPanel({ writeup, onUnlocked }) {
 function WriteupDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const writeup = useMemo(
     () => writeupsData.items?.find((item) => item.slug === slug),
     [slug]
@@ -213,6 +214,15 @@ function WriteupDetail() {
   const [status, setStatus] = useState('idle');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const bodyRef = useRef(null);
+
+  // Keyword forwarded from the search bar (?q=). We scroll to and pulse the
+  // first occurrence of it in the rendered body so the user lands on exactly
+  // what they searched for.
+  const highlightTerm = useMemo(() => {
+    const raw = new URLSearchParams(location.search).get('q') || '';
+    return raw.trim();
+  }, [location.search]);
 
   const assetBase = useMemo(() => {
     if (!writeup) return '';
@@ -335,6 +345,19 @@ function WriteupDetail() {
     };
   }, [assetBase]);
 
+  // Memoize the rendered markdown so unrelated re-renders (e.g. the scroll
+  // handler toggling showScrollTop) don't reconcile the markdown subtree —
+  // that would strip the <mark> the highlight effect injects into the DOM.
+  const markdownElement = useMemo(() => (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeSlug]}
+      components={markdownComponents}
+    >
+      {processedContent.markdown}
+    </ReactMarkdown>
+  ), [processedContent.markdown, markdownComponents]);
+
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
@@ -342,6 +365,59 @@ function WriteupDetail() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Scroll to + pulse the first occurrence of the search keyword.
+  useEffect(() => {
+    if (status !== 'ready' || !highlightTerm) return undefined;
+    const container = bodyRef.current;
+    if (!container || typeof window === 'undefined') return undefined;
+
+    const term = highlightTerm.toLowerCase();
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    let matchNode = null;
+    let matchIndex = -1;
+    let node = walker.nextNode();
+    while (node) {
+      const idx = node.nodeValue.toLowerCase().indexOf(term);
+      if (idx !== -1) {
+        matchNode = node;
+        matchIndex = idx;
+        break;
+      }
+      node = walker.nextNode();
+    }
+
+    if (!matchNode) return undefined;
+
+    let mark = null;
+    try {
+      const range = document.createRange();
+      range.setStart(matchNode, matchIndex);
+      range.setEnd(matchNode, matchIndex + term.length);
+      mark = document.createElement('mark');
+      mark.className = 'search-jump-highlight';
+      range.surroundContents(mark);
+    } catch (error) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timer);
+      // Unwrap the <mark> so a term change / unmount leaves the DOM clean.
+      const parent = mark.parentNode;
+      if (parent) {
+        while (mark.firstChild) {
+          parent.insertBefore(mark.firstChild, mark);
+        }
+        parent.removeChild(mark);
+        parent.normalize();
+      }
+    };
+  }, [status, highlightTerm, processedContent.markdown]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -458,17 +534,11 @@ function WriteupDetail() {
             </header>
 
             <section className="writeup-detail">
-              <div className="writeup-body">
-                {/* rehype-raw is intentionally NOT used here — omitting it is
-                    what keeps raw HTML in markdown escaped/inert instead of
-                    rendered, which is the XSS guard for this renderer. */}
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeSlug]}
-                  components={markdownComponents}
-                >
-                  {processedContent.markdown}
-                </ReactMarkdown>
+              {/* rehype-raw is intentionally NOT used here (see markdownElement
+                  above) — omitting it keeps raw HTML in markdown escaped/inert
+                  instead of rendered, which is the XSS guard for this renderer. */}
+              <div className="writeup-body" ref={bodyRef}>
+                {markdownElement}
               </div>
             </section>
           </div>
