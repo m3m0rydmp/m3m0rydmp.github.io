@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { ArrowUp, List } from 'lucide-react';
+import { ArrowUp, List, Lock, ShieldAlert } from 'lucide-react';
 import writeupsData from '../data/writeupsData.json';
 import './WriteupDetail.css';
 
@@ -37,6 +37,101 @@ function resolveImageSource(src, assetBase) {
   }
 
   return `${cleanedBase}/${normalizedSrc}`.replace(/\\/g, '/');
+}
+
+function base64ToBytes(base64) {
+  const binary = window.atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+/**
+ * Derives an AES-256-GCM key from a passphrase via PBKDF2-SHA256 and
+ * decrypts the ciphertext produced by scripts/lockWriteup.js. This runs
+ * entirely client-side (Web Crypto) — the site is static, so there is no
+ * server to check the passphrase against; a wrong key simply fails GCM
+ * authentication.
+ * @param {{salt: string, iv: string, data: string, iter: number}} payload
+ * @param {string} passphrase
+ * @returns {Promise<string>} decrypted UTF-8 markdown
+ */
+async function decryptLockedPayload(payload, passphrase) {
+  const salt = base64ToBytes(payload.salt);
+  const iv = base64ToBytes(payload.iv);
+  const dataWithTag = base64ToBytes(payload.data);
+
+  const baseKey = await window.crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(passphrase),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
+
+  const aesKey = await window.crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: payload.iter, hash: 'SHA-256' },
+    baseKey,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
+
+  const plainBuffer = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, aesKey, dataWithTag);
+  return new TextDecoder().decode(plainBuffer);
+}
+
+function LockedWriteupPanel({ writeup, onUnlocked }) {
+  const [keyInput, setKeyInput] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [denied, setDenied] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!keyInput || busy) return;
+    setBusy(true);
+    setDenied(false);
+    try {
+      const requestUrl = encodeURI(writeup.sourcePath);
+      const response = await fetch(requestUrl);
+      if (!response.ok) throw new Error('Unable to fetch encrypted datashard.');
+      const payload = await response.json();
+      const plaintext = await decryptLockedPayload(payload, keyInput);
+      onUnlocked(plaintext);
+    } catch (error) {
+      setDenied(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="locked-writeup-panel">
+      <div className="locked-writeup-icon">
+        {denied ? <ShieldAlert size={40} /> : <Lock size={40} />}
+      </div>
+      <h2 className="locked-writeup-title">ENCRYPTED DATASHARD</h2>
+      <p className="locked-writeup-subtitle">// ENTER DECRYPTION KEY</p>
+      <form className="locked-writeup-form" onSubmit={handleSubmit}>
+        <input
+          type="password"
+          className="locked-writeup-input"
+          placeholder="DECRYPTION KEY"
+          value={keyInput}
+          onChange={(event) => setKeyInput(event.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+          disabled={busy}
+        />
+        <button type="submit" className="locked-writeup-btn" disabled={busy || !keyInput}>
+          {busy ? 'DECRYPTING…' : 'DECRYPT'}
+        </button>
+      </form>
+      {denied && <p className="locked-writeup-denied">ACCESS DENIED // KEY REJECTED</p>}
+    </div>
+  );
 }
 
 function WriteupDetail() {
@@ -168,6 +263,11 @@ function WriteupDetail() {
       return;
     }
 
+    if (writeup.locked) {
+      setStatus('locked');
+      return;
+    }
+
     let canceled = false;
     const controller = new AbortController();
 
@@ -208,6 +308,16 @@ function WriteupDetail() {
       {status === 'loading' && <p className="status-line" style={{ padding: '2rem' }}>Initializing markdown parser…</p>}
       {status === 'error' && (
         <p className="status-line error" style={{ padding: '2rem' }}>Unable to load the markdown document. Please refresh and try again.</p>
+      )}
+
+      {status === 'locked' && (
+        <LockedWriteupPanel
+          writeup={writeup}
+          onUnlocked={(plaintext) => {
+            setContent(plaintext);
+            setStatus('ready');
+          }}
+        />
       )}
 
       {status === 'ready' && (

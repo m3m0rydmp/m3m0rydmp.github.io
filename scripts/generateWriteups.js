@@ -85,6 +85,42 @@ async function main() {
     });
   }
 
+  // Locked writeups: folders that ship only ciphertext (content.enc) + a
+  // non-secret sidecar (meta.json). No plaintext exists on disk for these,
+  // so they are intentionally excluded from collectMarkdownFiles above and
+  // from searchRecords below (no content to leak into the search index).
+  const lockedDirs = await collectLockedDirs(SOURCE_DIR);
+  for (const dirPath of lockedDirs) {
+    const relativePath = normalizeRelativePath(path.relative(SOURCE_DIR, dirPath));
+    const slug = createSlug(relativePath);
+    const meta = JSON.parse(await fs.readFile(path.join(dirPath, 'meta.json'), 'utf-8'));
+
+    const publishedAt = meta.displayDateSource || null;
+    const displayDate = publishedAt
+      ? new Date(publishedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+      : 'Unknown';
+
+    records.push({
+      id: slug,
+      slug,
+      title: meta.title,
+      category: 'Restricted',
+      difficulty: meta.difficulty || 'unknown',
+      os: 'N/A',
+      tags: [],
+      readTime: 'Locked',
+      publishedAt,
+      displayDate,
+      excerpt: meta.excerpt,
+      coverImage: null,
+      platform: meta.platform,
+      sourcePath: `/${path.posix.join('writeups', relativePath, 'content.enc')}`,
+      wordCount: 0,
+      locked: true
+    });
+    // Intentionally NOT pushed to searchRecords — no plaintext to index.
+  }
+
   records.sort((a, b) => {
     const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
     const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
@@ -150,6 +186,30 @@ async function collectMarkdownFiles(dir) {
         continue;
       }
       results.push(entryPath);
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Finds directories that contain both `content.enc` and `meta.json` —
+ * i.e. locked/password-gated writeups with no plaintext markdown on disk.
+ * @param {string} dir
+ * @returns {Promise<string[]>}
+ */
+async function collectLockedDirs(dir) {
+  const results = [];
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const names = entries.filter((e) => e.isFile()).map((e) => e.name);
+
+  if (names.includes('content.enc') && names.includes('meta.json')) {
+    results.push(dir);
+  }
+
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      results.push(...(await collectLockedDirs(path.join(dir, entry.name))));
     }
   }
 
