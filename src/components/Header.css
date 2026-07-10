@@ -15,6 +15,7 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--spacing-lg);
+  position: relative;
 }
 
 .logo {
@@ -26,16 +27,16 @@
 }
 
 .logo .bracket {
-  color: var(--primary-cyan);
-  text-shadow: 0 0 10px var(--primary-cyan);
+  color: var(--cp-cyan);
+  text-shadow: 0 0 10px var(--cp-cyan);
 }
 
 .logo .brand {
-  background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
+  background: linear-gradient(135deg, var(--cp-cyan), var(--cp-teal));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  text-shadow: 0 0 10px rgba(var(--cp-cyan-rgb), 0.5);
 }
 
 .nav-links {
@@ -68,14 +69,14 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--primary-cyan), var(--primary-purple));
+  background: linear-gradient(90deg, var(--cp-cyan), var(--cp-teal));
   transition: width var(--transition-normal);
-  box-shadow: 0 0 10px var(--primary-cyan);
+  box-shadow: 0 0 10px var(--cp-cyan);
 }
 
 .nav-link:hover,
 .nav-link.active {
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
 }
 
 .nav-link:hover::after,
@@ -87,15 +88,24 @@
   display: none;
   flex-direction: column;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+  margin: 0;
+}
+
+.hamburger:focus-visible {
+  outline: 2px solid var(--cp-cyan);
+  outline-offset: 2px;
 }
 
 .hamburger span {
   width: 25px;
   height: 3px;
-  background-color: var(--primary-cyan);
+  background-color: var(--cp-cyan);
   margin: 5px 0;
   transition: all var(--transition-normal);
-  box-shadow: 0 0 5px var(--primary-cyan);
+  box-shadow: 0 0 5px var(--cp-cyan);
 }
 
 .hamburger.active span:nth-child(1) {
@@ -113,6 +123,7 @@
 @media (max-width: 768px) {
   .navbar {
     padding: var(--spacing-md);
+    flex-wrap: wrap;
   }
 
   .logo {
@@ -122,7 +133,7 @@
   .nav-links {
     display: none;
     position: absolute;
-    top: 60px;
+    top: 100%;
     left: 0;
     right: 0;
     flex-direction: column;
@@ -130,6 +141,8 @@
     gap: 0;
     border-bottom: 2px solid var(--border-glow);
     z-index: 99;
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
   }
 
   .nav-links.active {
@@ -138,7 +151,7 @@
 
   .nav-link {
     padding: var(--spacing-md);
-    border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+    border-bottom: 1px solid rgba(var(--cp-cyan-rgb), 0.1);
     width: 100%;
     text-align: left;
   }

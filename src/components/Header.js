@@ -1,9 +1,33 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import config from '../config';
 import SearchBar from './SearchBar';
 import './Header.css';
 
 function Header({ activeSection, setActiveSection }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close the mobile menu on Escape and prevent body scroll while it's open.
+  useEffect(() => {
+    if (!menuOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [menuOpen]);
+
   // Scroll spy - detect which section is in view
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +54,7 @@ function Header({ activeSection, setActiveSection }) {
 
   const handleNavClick = (e, href) => {
     e.preventDefault();
+    setMenuOpen(false);
 
     if (href === '#home') {
       // Scroll to top for home button
@@ -52,6 +77,8 @@ function Header({ activeSection, setActiveSection }) {
     }
   };
 
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
+
   return (
     <header className="header">
       <nav className="navbar">
@@ -61,8 +88,21 @@ function Header({ activeSection, setActiveSection }) {
           <span className="bracket">]</span>
         </div>
 
+        <button
+          type="button"
+          className={`hamburger ${menuOpen ? 'active' : ''}`}
+          aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={menuOpen}
+          aria-controls="primary-nav-links"
+          onClick={toggleMenu}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
         <div className="nav-controls">
-          <ul className="nav-links">
+          <ul id="primary-nav-links" className={`nav-links ${menuOpen ? 'active' : ''}`}>
             {config.navigation.links.map((link) => {
               const sectionId = link.href.substring(1); // Remove # from href
               return (

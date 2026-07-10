@@ -56,7 +56,7 @@
   font-size: 0.85rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -261,7 +261,7 @@
 
 .writeup-body input[type="checkbox"] {
   margin-right: 0.5rem;
-  accent-color: var(--primary-cyan);
+  accent-color: var(--cp-cyan);
   transform: translateY(1px);
 }
 
@@ -285,7 +285,7 @@
 }
 
 .writeup-body th {
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   text-align: left;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -360,33 +360,33 @@
 }
 
 .md-meta-pill.difficulty.medium {
-  background: rgba(255, 165, 0, 0.18);
-  border-color: rgba(255, 165, 0, 0.4);
-  color: #ffb347;
+  background: rgba(var(--diff-medium-rgb), 0.18);
+  border-color: rgba(var(--diff-medium-rgb), 0.4);
+  color: var(--diff-medium);
 }
 
 .md-meta-pill.difficulty.insane {
-  background: rgba(255, 77, 109, 0.2);
-  border-color: rgba(255, 77, 109, 0.4);
-  color: #ff4d6d;
+  background: rgba(var(--diff-insane-rgb), 0.2);
+  border-color: rgba(var(--diff-insane-rgb), 0.4);
+  color: var(--diff-insane);
 }
 
 .md-meta-pill.difficulty.easy {
-  background: rgba(57, 255, 20, 0.15);
-  border-color: rgba(57, 255, 20, 0.3);
-  color: #b4ff9f;
+  background: rgba(var(--diff-easy-rgb), 0.15);
+  border-color: rgba(var(--diff-easy-rgb), 0.3);
+  color: var(--diff-easy);
 }
 
 .md-meta-pill.difficulty.very-easy {
-  background: rgba(115, 255, 186, 0.15);
-  border-color: rgba(115, 255, 186, 0.4);
-  color: #73ffba;
+  background: rgba(var(--diff-very-easy-rgb), 0.15);
+  border-color: rgba(var(--diff-very-easy-rgb), 0.4);
+  color: var(--diff-very-easy);
 }
 
 .md-meta-pill.difficulty.hard {
-  background: rgba(152, 95, 255, 0.15);
-  border-color: rgba(152, 95, 255, 0.35);
-  color: #b88cff;
+  background: rgba(var(--diff-hard-rgb), 0.15);
+  border-color: rgba(var(--diff-hard-rgb), 0.35);
+  color: var(--diff-hard);
 }
 
 .md-meta-pill.difficulty.unknown {
@@ -433,6 +433,7 @@
   top: 100px;
   height: fit-content;
   max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
   overflow-y: auto;
   padding: var(--spacing-md);
   background: rgba(4, 9, 20, 0.9);
@@ -440,7 +441,7 @@
   border-radius: 8px;
   margin-top: var(--spacing-xl);
   scrollbar-width: thin;
-  scrollbar-color: var(--primary-cyan) transparent;
+  scrollbar-color: var(--cp-cyan) transparent;
 }
 
 .toc-header {
@@ -455,7 +456,7 @@
 .toc-header h3 {
   font-size: 0.8rem;
   letter-spacing: 2px;
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   margin: 0;
 }
 
@@ -488,7 +489,7 @@
 }
 
 .writeup-toc a:hover {
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
 }
 
 .toc-level-3 {
@@ -513,7 +514,7 @@
   border-radius: 50%;
   background: rgba(5, 11, 24, 0.9);
   border: 1px solid rgba(84, 193, 230, 0.4);
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -523,7 +524,7 @@
 }
 
 .action-btn:hover {
-  background: var(--primary-cyan);
+  background: var(--cp-cyan);
   color: var(--dark-bg);
   box-shadow: 0 0 20px rgba(84, 193, 230, 0.5);
   transform: translateY(-2px);
@@ -615,7 +616,7 @@
 }
 
 .locked-writeup-icon {
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -634,7 +635,7 @@
 
 .locked-writeup-subtitle {
   font-family: var(--font-family);
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   font-size: 0.85rem;
   letter-spacing: 1px;
   margin: 0 0 var(--spacing-md);
@@ -661,16 +662,16 @@
 
 .locked-writeup-input:focus {
   outline: none;
-  border-color: var(--primary-cyan);
+  border-color: var(--cp-cyan);
   box-shadow: 0 0 0 2px rgba(84, 193, 230, 0.25);
 }
 
 .locked-writeup-btn {
   padding: 0.75rem 1rem;
   background: transparent;
-  border: 1px solid var(--primary-cyan);
+  border: 1px solid var(--cp-cyan);
   border-radius: 4px;
-  color: var(--primary-cyan);
+  color: var(--cp-cyan);
   font-family: var(--font-family);
   font-weight: 700;
   letter-spacing: 2px;
@@ -679,7 +680,7 @@
 }
 
 .locked-writeup-btn:hover:not(:disabled) {
-  background: var(--primary-cyan);
+  background: var(--cp-cyan);
   color: #04070f;
 }
 

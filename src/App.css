@@ -3,6 +3,7 @@
 .terminal-frame {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   z-index: 1;
@@ -18,7 +19,7 @@ main {
 
 section {
   padding: var(--spacing-xl) 0;
-  border-top: 1px solid rgba(0, 240, 255, 0.1);
+  border-top: 1px solid rgba(var(--cp-cyan-rgb), 0.1);
 }
 
 section:first-of-type {

@@ -4,6 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-color: #0a0e27;
   color: #54c1e6;
   display: flex;
