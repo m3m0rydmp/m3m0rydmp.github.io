@@ -27,6 +27,7 @@ function WriteupDrawer({ isOpen = true, onToggle = () => { }, showToggle = true,
         return {
           slug: writeup.platform.toLowerCase().replace(/[^a-z0-9]/g, ''),
           label: writeup.platform,
+          eventSlug: writeup.eventSlug,
         };
       }
       return null;
@@ -52,7 +53,7 @@ function WriteupDrawer({ isOpen = true, onToggle = () => { }, showToggle = true,
   const handleBackToPlatform = (e) => {
     e.preventDefault();
     if (currentPlatform) {
-      navigate(`/writeups/platform/${currentPlatform}`);
+      navigate(currentPlatformInfo?.eventSlug ? `/writeups/${currentPlatformInfo.eventSlug}` : `/writeups/platform/${currentPlatform}`);
     }
   };
 
@@ -126,7 +127,7 @@ function WriteupDrawer({ isOpen = true, onToggle = () => { }, showToggle = true,
             className="drawer-back-button"
           >
             <ArrowLeft size={16} />
-            <span>Writeup List</span>
+            <span>{currentPlatformInfo?.eventSlug ? 'Event challenges' : 'Writeup List'}</span>
           </a>
         )}
         {navLinks.map((link) => (

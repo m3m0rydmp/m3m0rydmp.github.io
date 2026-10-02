@@ -2,18 +2,26 @@
 
 const { promises: fs } = require('fs');
 const path = require('path');
+const { sortWriteups } = require('../src/algorithms/sortWriteups');
 
 const SOURCE_DIR = path.resolve('writeups');
 const PUBLIC_DIR = path.resolve('public', 'writeups');
 const DATA_FILE = path.resolve('src', 'data', 'writeupsData.json');
-const SEARCH_INDEX_FILE = path.resolve('src', 'data', 'searchIndex.json');
+const SEARCH_INDEX_FILE = path.resolve('public', 'writeups-search.json');
 
 const METADATA_KEYS = [
+  { key: 'kind', pattern: /^type\s*:/i },
+  { key: 'eventSlug', pattern: /^event\s*:/i },
+  { key: 'coverage', pattern: /^coverage\s*:/i },
+  { key: 'bountyPlatform', pattern: /^bounty platform\s*:/i },
+  { key: 'severity', pattern: /^severity\s*:/i },
   { key: 'difficulty', pattern: /^difficulty\s*:/i },
   { key: 'category', pattern: /^category\s*:/i },
   { key: 'os', pattern: /^os\s*:/i },
   { key: 'tags', pattern: /^tags?\s*:/i },
   { key: 'publishedAt', pattern: /^date\s*:/i },
+  { key: 'addedAt', pattern: /^added\s*:/i },
+  { key: 'defaultPosition', pattern: /^default position\s*:/i },
   { key: 'platform', pattern: /^platform\s*:/i }
 ];
 
@@ -23,6 +31,7 @@ const DEFAULT_META = {
   os: 'N/A',
   tags: [],
   publishedAt: null,
+  addedAt: null,
   platform: 'Uncategorized'
 };
 
@@ -42,6 +51,15 @@ async function main() {
 
   await fs.rm(PUBLIC_DIR, { recursive: true, force: true });
   await copyDirectory(SOURCE_DIR, PUBLIC_DIR);
+
+  let previousItems = [];
+  try {
+    previousItems = JSON.parse(await fs.readFile(DATA_FILE, 'utf-8')).items || [];
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+  const previousAdded = new Map(previousItems.map((item) => [item.slug, item.addedAt || item.publishedAt]));
+  const importedAt = new Date().toISOString();
 
   const files = await collectMarkdownFiles(SOURCE_DIR);
   const records = [];
@@ -64,10 +82,17 @@ async function main() {
       tags: metadata.tags,
       readTime: metadata.readTime,
       publishedAt: metadata.publishedAt,
+      addedAt: metadata.addedAt || previousAdded.get(slug) || importedAt,
+      ...(metadata.defaultPosition?.toLowerCase() === 'bottom' ? { defaultPosition: 'bottom' } : {}),
       displayDate: metadata.displayDate,
       excerpt: metadata.excerpt,
       coverImage: metadata.coverImage,
       platform: metadata.platform,
+      ...(metadata.bountyPlatform ? { bountyPlatform: metadata.bountyPlatform } : {}),
+      ...(metadata.severity ? { severity: metadata.severity } : {}),
+      ...(metadata.kind ? { kind: metadata.kind } : {}),
+      ...(metadata.eventSlug ? { eventSlug: metadata.eventSlug } : {}),
+      ...(metadata.coverage ? { coverage: metadata.coverage } : {}),
       sourcePath: `/${path.posix.join('writeups', relativePath)}`,
       wordCount: metadata.wordCount
     });
@@ -104,6 +129,7 @@ async function main() {
       tags: [],
       readTime: 'Locked',
       publishedAt,
+      addedAt: meta.addedAt || previousAdded.get(slug) || importedAt,
       displayDate,
       excerpt: meta.excerpt,
       coverImage: null,
@@ -115,16 +141,20 @@ async function main() {
     // Not added to the search index.
   }
 
-  records.sort((a, b) => {
-    const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-    const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-    return bTime - aTime;
-  });
+  const slugs = new Set(records.map(record => record.slug));
+  if (slugs.size !== records.length) throw new Error('Duplicate writeup slugs; check folder names.');
+  const eventSlugs = new Set(records.filter(record => record.kind === 'event').map(record => record.slug));
+  for (const record of records) {
+    if (record.eventSlug && !eventSlugs.has(record.eventSlug)) {
+      throw new Error(`Missing event library for ${record.slug}`);
+    }
+  }
+  const sortedRecords = sortWriteups(records);
 
   await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
   await fs.writeFile(
     DATA_FILE,
-    JSON.stringify({ generatedAt: new Date().toISOString(), items: records }, null, 2),
+    JSON.stringify({ generatedAt: new Date().toISOString(), items: sortedRecords }, null, 2),
     'utf-8'
   );
 
@@ -213,7 +243,10 @@ function createSlug(relativePath) {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-    return `${platform}-${machineName}`;
+    const challenge = platform === 'ctfs' && segments.length > 3
+      ? '-' + segments.slice(2, -1).join('-').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      : '';
+    return `${platform}-${machineName}${challenge}`;
   }
 
   return segments
@@ -241,8 +274,8 @@ function parseMetadata(content, stats, relativePath) {
 
         if (key === 'tags') {
           metadata.tags = value.split(',').map((tag) => tag.trim()).filter(Boolean);
-        } else if (key === 'publishedAt') {
-          metadata.publishedAt = value;
+        } else if (key === 'publishedAt' || key === 'addedAt') {
+          metadata[key] = value;
         } else {
           metadata[key] = value;
         }
@@ -316,17 +349,28 @@ function extractHeroImage(lines, relativePath) {
 
 function extractExcerpt(lines) {
   const buffer = [];
+  let fence = null;
 
   for (const line of lines) {
     const trimmed = line.trim();
+    const marker = /^(`{3,}|~{3,})/.exec(trimmed);
+    if (marker) {
+      if (buffer.length) break;
+      if (!fence) fence = marker[1];
+      else if (marker[1][0] === fence[0] && marker[1].length >= fence.length) fence = null;
+      continue;
+    }
+    if (fence) continue;
     if (!trimmed) {
+      if (buffer.length) break;
       continue;
     }
 
     if (
       trimmed.startsWith('#') ||
-      /^(difficulty|category|os|tags|date)\s*:/i.test(trimmed) ||
-      trimmed.startsWith('![')
+      /^(type|event|coverage|platform|bounty platform|severity|difficulty|category|os|tags?|date|added|default position)\s*:/i.test(trimmed) ||
+      trimmed.startsWith('![') ||
+      /^[-*_]{3,}$/.test(trimmed)
     ) {
       continue;
     }

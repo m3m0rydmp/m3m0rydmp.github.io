@@ -13,7 +13,7 @@ Race condition occurs when multiple threads execute simultaneously. The output i
 
 ### Example of Race Condition
 
-Take a look at this python program and observe:
+I use this Python example to examine how the threads execute:
 
 ```python
 import threading
@@ -54,7 +54,7 @@ Both threads are executed together, and the output on whether which thread would
 
 ### Scenario 1 | Sending Request in Sequence
 
-When executing race condition in sequence, the requests are sent one after the another. In a simple logic, it’s like you’re just spamming the button to send. If you only have $30 and you’re sending $10 to someone, when sending 10 request 3 out of 10 will only be successful since the requests are not running simultaneously but as an individual.
+When executing race condition in sequence, the requests are sent one after the another. In a simple logic, it’s like I'm just spamming the button to send. If I only have $30 and I'm sending $10 to someone, when sending 10 request 3 out of 10 will only be successful since the requests are not running simultaneously but as an individual.
 
 ### Scenario 2 | Sending Request in Parallel
 
@@ -62,4 +62,4 @@ This is the very likely scenario that should be used by pentesters. As the reque
 
 ![image.png](image.png)
 
-Take a look at this photo, these are the request sent in parallel. They are successful request to modify something, and all of the successful request has a length of frame 68.
+In the captured parallel requests below, I see several successful responses with a frame length of 68.

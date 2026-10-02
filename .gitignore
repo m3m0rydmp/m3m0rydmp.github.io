@@ -48,6 +48,7 @@ TODO.md
 
 # Generated assets
 public/writeups/
+public/writeups-search.json
 src/data/writeupsData.json
 
 # Sensitive files
@@ -69,4 +70,8 @@ src/data/writeupsData.json
 .eslintcache
 .npm/
 .yarn/
+
+# Local browser review artifacts
+.playwright-cli/
+output/playwright/
 

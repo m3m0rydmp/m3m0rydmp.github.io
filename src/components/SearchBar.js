@@ -45,9 +45,13 @@ function SearchBar({ platformFilter = null, customClass = '' }) {
     // Load search index when the searchbar is first interacted with
     useEffect(() => {
         if ((isFocused || query.length > 0) && !dataIndex) {
-            import('../data/searchIndex.json')
-                .then((module) => {
-                    setDataIndex(module.default?.items || module.items || []);
+            fetch('/writeups-search.json')
+                .then((response) => {
+                    if (!response.ok) throw new Error(`Search index: ${response.status}`);
+                    return response.json();
+                })
+                .then((index) => {
+                    setDataIndex(Array.isArray(index.items) ? index.items : []);
                 })
                 .catch((error) => {
                     console.error("Failed to load search index", error);

@@ -2,7 +2,7 @@
   "name": "m3m0rydmp-portfolio",
   "version": "1.0.0",
   "description": "Cyberpunk-themed writeup showcase",
-  "homepage": "https://m3m0rydmp.github.io",
+  "homepage": "https://m3m0rydmp.net",
   "private": true,
   "dependencies": {
     "@fontsource/jetbrains-mono": "^5.2.8",
@@ -20,10 +20,11 @@
     "remark-gfm": "^4.0.0"
   },
   "scripts": {
+    "check:writeups": "node scripts/checkWriteups.js",
     "sync:writeups": "node scripts/generateWriteups.js",
     "prestart": "npm run sync:writeups",
     "start": "react-scripts start",
-    "prebuild": "npm run sync:writeups",
+    "prebuild": "npm run check:writeups && npm run sync:writeups",
     "build": "react-scripts build && npm run postbuild",
     "postbuild": "powershell -Command \"Copy-Item build/index.html build/403.html; Copy-Item build/index.html build/500.html; Copy-Item build/index.html build/502.html; Copy-Item build/index.html build/503.html\"",
     "test": "react-scripts test",

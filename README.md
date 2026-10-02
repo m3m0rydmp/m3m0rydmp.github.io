@@ -6,7 +6,9 @@ The site automatically processes markdown writeups, extracts metadata (difficult
 
 ## Live Site
 
-**https://m3m0rydmp.github.io/**
+**https://m3m0rydmp.net/**
+
+Hosted on GitHub Pages behind Cloudflare. See the [writeup editing guide](docs/writeup-style.md) for imports, first-person narration, image links, and local validation.
 
 ## Features
 
@@ -92,4 +94,4 @@ The site automatically processes markdown writeups, extracts metadata (difficult
 
 ---
 
-**Last Updated**: November 22, 2025 
+**Last Updated**: October 1, 2026

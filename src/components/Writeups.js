@@ -52,7 +52,7 @@ const CATEGORY_ICONS = {
 
 
 function Writeups() {
-  const items = useMemo(() => writeupsData.items ?? [], []);
+  const items = useMemo(() => (writeupsData.items ?? []).filter(item => !item.eventSlug), []);
 
   const groupedSections = useMemo(() => {
     const claimedIds = new Set();

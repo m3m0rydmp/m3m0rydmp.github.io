@@ -55,7 +55,7 @@ Suppose the web application provides two languages, and the user can select betw
 
 The PHP code above uses a GET request via the URL parameter lang to include the file of the page. The call can be done by sending the following HTTP request as follows: `http://webapp.thm/index.php?lang=EN.php` to load the English page or `http://webapp.thm/index.php?lang=AR.php` to load the Arabic page, where EN.php and AR.php files exist in the same directory.
 
-Theoretically, we can access and display any readable file on the server from the code above if there isn't any input validation. Let's say we want to read the `/etc/passwd` file, which contains sensitive information about the users of the Linux operating system, we can try the following: `http://webapp.thm/get.php?file=/etc/passwd`
+Without input validation, I can test whether the include operation accepts a readable file such as `/etc/passwd`. For the `lang` parameter above, my test request would be `http://webapp.thm/index.php?lang=/etc/passwd`.
 
 In this case, it works because there isn't a directory specified in the include function and no input validation.
 
@@ -69,11 +69,11 @@ In this example, the developer decided to specify the directory inside the funct
 
 Since the developer decided to use the `include` function to call `PHP` files/pages in the `languages` directory only via `lang` parameters.
 
-Considering that there is no input validation, the attacker can manipulate the URL by replacing the `lang` input with other OS-sensitive files such as `/etc/passwd` 
+Considering that there is no input validation, the attacker can manipulate the URL by replacing the `lang` input with other OS-sensitive files such as `/etc/passwd`
 
-So it will be `index.php?lang=../../../../etc/passwd` 
+So it will be `index.php?lang=../../../../etc/passwd`
 
-In this example, we don’t know the source code but we are presented with an error.
+In this example, I don’t know the source code but I'm presented with an error.
 
 ```php
 Warning: include(languages/THM.php): failed to open stream: No such file or directory in /var/www/html/THM-4/index.php on line 12
@@ -81,7 +81,7 @@ Warning: include(languages/THM.php): failed to open stream: No such file or dire
 
 The error message discloses significant information. By entering THM as input, an error message shows what the include function looks like: `include(languages/THM.php);`.
 
-If we use the technique earlier `../../../etc/passwd` we will receive an error.
+If I use the technique earlier `../../../etc/passwd` I'll receive an error.
 
 ```php
 Warning: include(languages/../../../../../etc/passwd.php): failed to open stream: No such file or directory in /var/www/html/THM-4/index.php on line 12
@@ -89,32 +89,32 @@ Warning: include(languages/../../../../../etc/passwd.php): failed to open stream
 
 Meaning that in the source code it points to a `php` file in the specified directory.
 
-To do this we need to inject a null byte `%00` at the end to bypass the filter.
+To do this I need to inject a null byte `%00` at the end to bypass the filter.
 
-Using null bytes is an injection technique where URL-encoded representation such as %00 or 0x00 in hex with user-supplied data to terminate strings. You could think of it as trying to trick the web app into disregarding whatever comes after the Null Byte.
+Using null bytes is an injection technique where URL-encoded representation such as %00 or 0x00 in hex with user-supplied data to terminate strings. I could think of it as trying to trick the web app into disregarding whatever comes after the Null Byte.
 
-By adding the Null Byte at the end of the payload, we tell the include function to ignore anything after the null byte which may look like:
+By adding the Null Byte at the end of the payload, I tell the include function to ignore anything after the null byte which may look like:
 
 `include("languages/../../../../../etc/passwd%00").".php");` which is equivalent to `include("languages/../../../../../etc/passwd");`
 
-In this example, the developer decided to filter keywords to avoid disclosing sensitive information! The /etc/passwd file is being filtered. There are two possible methods to bypass the filter. First, by using the NullByte %00 or the current directory trick at the end of the filtered keyword `/..` The exploit will be similar to `http://webapp.thm/index.php?lang=/etc/passwd/`. We could also use `http://webapp.thm/index.php?lang=/etc/passwd%00`.
+In this example, the developer decided to filter keywords to avoid disclosing sensitive information! The /etc/passwd file is being filtered. There are two possible methods to bypass the filter. First, by using the NullByte %00 or the current directory trick at the end of the filtered keyword `/..` The exploit will be similar to `http://webapp.thm/index.php?lang=/etc/passwd/`. I could also use `http://webapp.thm/index.php?lang=/etc/passwd%00`.
 
-To make it clearer, if we try this concept in the file system using `cd ..`, it will get you back one step; however, if you do `cd .`, It stays in the current directory. Similarly, if we try `/etc/passwd/..`, it results to be `/etc/` and that's because we moved one to the root. Now if we try `/etc/passwd/.`, the result will be `/etc/passwd` since dot refers to the current directory.
+I distinguish path components such as `.` and `..` from actual filter bypasses. A trailing slash or dot does not make an ordinary file a directory; whether a crafted path succeeds depends on the application's normalization and runtime behavior.
 
-In the following scenarios, the developer starts to use input validation by filtering some keywords. Let's test out and check the error message!
+In the following scenarios, the developer starts to use input validation by filtering some keywords. I'll test out and check the error message!
 
 `http://webapp.thm/index.php?lang=../../../../etc/passwd`
 
-We got the following error!
+I got the following error!
 
 ```php
 Warning: include(languages/etc/passwd): failed to open stream: No such file or directory in /var/www/html/THM-5/index.php on line 15
 
 ```
 
-If we check the warning message in the `include(languages/etc/passwd)` section, we know that the web application replaces the `../` with the empty string. There are a couple of techniques we can use to bypass this.
+If I check the warning message in the `include(languages/etc/passwd)` section, I know that the web application replaces the `../` with the empty string. There are a couple of techniques I can use to bypass this.
 
-First, we can send the following payload to bypass it: `....//....//....//....//....//etc/passwd`.
+First, I can send the following payload to bypass it: `....//....//....//....//....//etc/passwd`.
 
 Why did this work?
 
@@ -122,4 +122,4 @@ This works because the PHP filter only matches and replaces the first subset s
 
 ![image.png](image.png)
 
-Lastly, the developer forces the include to read from a defined directory! For example, if the web application asks to supply input that has to include a directory such as: `http://webapp.thm/index.php?lang=languages/EN.php` then, to exploit this, we need to include the directory in the payload like so: `?lang=languages/../../../../../etc/passwd`.
+Lastly, the developer forces the include to read from a defined directory! For example, if the web application asks to supply input that has to include a directory such as: `http://webapp.thm/index.php?lang=languages/EN.php` then, to exploit this, I need to include the directory in the payload like so: `?lang=languages/../../../../../etc/passwd`.
