@@ -142,7 +142,11 @@ function SearchBar({ platformFilter = null, customClass = '' }) {
     };
 
     return (
-        <div className={`searchbar-container ${customClass}`.trim()} ref={dropdownRef}>
+        <div
+            className={`searchbar-container ${customClass}`.trim()}
+            ref={dropdownRef}
+            style={{ '--search-growth': `${Math.min(16, Math.max(0, query.length - 20))}ch` }}
+        >
             <div className={`search-input-wrapper ${isActive ? 'active' : ''}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="search-icon">
                     <circle cx="11" cy="11" r="8"></circle>
@@ -151,6 +155,7 @@ function SearchBar({ platformFilter = null, customClass = '' }) {
                 <input
                     type="text"
                     className="search-input"
+                    aria-label={platformFilter ? `Search ${platformFilter} writeups` : 'Search writeups'}
                     placeholder={platformFilter ? `Search ${platformFilter} writeups...` : "Search a keyword..."}
                     value={query}
                     onChange={(e) => {
@@ -163,7 +168,7 @@ function SearchBar({ platformFilter = null, customClass = '' }) {
                     }}
                 />
                 {query && (
-                    <button className="search-clear" onClick={() => {
+                    <button type="button" aria-label="Clear search" className="search-clear" onClick={() => {
                         setQuery('');
                         setResults([]);
                         setIsActive(false);

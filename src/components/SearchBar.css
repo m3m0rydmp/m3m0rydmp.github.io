@@ -1,7 +1,8 @@
 .searchbar-container {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: calc(600px + var(--search-growth, 0ch));
+    min-width: 0;
     margin: 0 auto 2rem;
     z-index: 100;
     font-family: var(--font-family);
@@ -9,7 +10,7 @@
 
 .searchbar-container.header-search {
     margin: 0;
-    max-width: 250px;
+    max-width: min(400px, calc(250px + var(--search-growth, 0ch)));
 }
 
 .search-input-wrapper {
@@ -42,7 +43,9 @@
 }
 
 .search-input {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0;
     background: transparent;
     border: none;
     font-family: var(--font-family);
@@ -58,6 +61,7 @@
 }
 
 .search-clear {
+    flex-shrink: 0;
     background: transparent;
     border: none;
     color: var(--text-muted);
@@ -154,6 +158,8 @@
 }
 
 .search-result-platform {
+    overflow-wrap: anywhere;
+    min-width: 0;
     font-size: 0.75rem;
     font-weight: 700;
     color: var(--cp-cyan);
@@ -162,6 +168,7 @@
 }
 
 .search-result-title {
+    min-width: 0;
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-color);
@@ -172,6 +179,7 @@
 }
 
 .search-result-snippet {
+    overflow-wrap: anywhere;
     font-size: 0.85rem;
     color: var(--text-muted);
     line-height: 1.5;
@@ -194,6 +202,7 @@
 }
 
 .search-no-results {
+    overflow-wrap: anywhere;
     padding: 2rem;
     text-align: center;
     color: var(--text-muted);
@@ -202,12 +211,6 @@
 
 @media (max-width: 768px) {
     .search-dropdown {
-        position: fixed;
-        top: 70px;
-        /* Below header */
-        left: 10px;
-        right: 10px;
-        width: auto;
-        z-index: 1000;
+        max-height: min(400px, 50dvh);
     }
 }

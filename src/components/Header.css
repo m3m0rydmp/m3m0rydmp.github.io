@@ -46,6 +46,7 @@
 }
 
 .nav-controls {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: var(--spacing-xl);
@@ -161,6 +162,7 @@
   }
 
   .nav-controls {
+    flex: 1 0 100%;
     flex-wrap: wrap;
     justify-content: center;
     width: 100%;
