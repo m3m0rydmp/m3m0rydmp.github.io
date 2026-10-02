@@ -1,0 +1,48 @@
+.report-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 100%;
+}
+
+.report-badge {
+  --badge-rgb: 174, 187, 203;
+  color: rgb(var(--badge-rgb));
+  background: rgba(var(--badge-rgb), 0.12);
+  border: 1px solid rgba(var(--badge-rgb), 0.5);
+  box-shadow: inset 3px 0 rgb(var(--badge-rgb)), 0 0 12px rgba(var(--badge-rgb), 0.08);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+
+/* Brand-inspired accents, lightened for legibility on the dark background. */
+.platform-bugcrowd { --badge-rgb: 255, 158, 85; }
+.platform-hackerone { --badge-rgb: 255, 128, 187; }
+.platform-yeswehack { --badge-rgb: 255, 115, 120; }
+.platform-intigriti { --badge-rgb: 112, 175, 255; }
+.platform-hackenproof { --badge-rgb: 121, 226, 156; }
+
+/* P1–P5 share the critical–informational scale: red, orange, yellow, green, blue. */
+.severity-critical { --badge-rgb: 255, 112, 125; }
+.severity-high { --badge-rgb: 255, 158, 85; }
+.severity-medium { --badge-rgb: 246, 210, 92; }
+.severity-low { --badge-rgb: 126, 218, 151; }
+.severity-informational { --badge-rgb: 116, 189, 255; }
+
+/* Vulnerability families have their own accents; these do not indicate severity. */
+.vulnerability-access-control { --badge-rgb: 191, 158, 255; }
+.vulnerability-authentication { --badge-rgb: 239, 150, 211; }
+.vulnerability-injection { --badge-rgb: 255, 175, 136; }
+.vulnerability-ssrf { --badge-rgb: 113, 216, 223; }
+.vulnerability-execution { --badge-rgb: 255, 139, 160; }
+.vulnerability-misconfiguration { --badge-rgb: 234, 203, 132; }
+.vulnerability-disclosure { --badge-rgb: 134, 189, 244; }
+
+.writeup-row .report-badges { margin-block: 0.25rem; }
+.writeup-row .report-badge { font-size: 0.66rem; padding: 0.2rem 0.55rem; }

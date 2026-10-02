@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -11,6 +11,7 @@ import WriteupDrawer from './components/WriteupDrawer';
 import PixelBlast from './components/PixelBlast';
 import './components/WriteupPage.css';
 import './App.css';
+import writeupsData from './data/writeupsData.json';
 
 const SPLASH_LAST_SHOWN_KEY = 'homeSplashLastShownAt';
 const SPLASH_RESHOW_MS = 10 * 60 * 1000;
@@ -54,6 +55,7 @@ const Writeups = lazy(() => import('./components/Writeups'));
 const Certifications = lazy(() => import('./components/Certifications'));
 const Projects = lazy(() => import('./components/Projects'));
 const About = lazy(() => import('./components/About'));
+const CtfEvent = lazy(() => import('./components/CtfEvent'));
 const WriteupDetail = lazy(() => import('./components/WriteupDetail'));
 const PlatformCategory = lazy(() => import('./components/PlatformCategory'));
 
@@ -109,6 +111,8 @@ function HomePage({ activeSection, setActiveSection }) {
 }
 
 function WriteupPage({ activeSection, setActiveSection }) {
+  const { slug } = useParams();
+  const entry = writeupsData.items.find(item => item.slug === slug);
   useEffect(() => {
     setActiveSection('writeups');
   }, [setActiveSection]);
@@ -153,7 +157,7 @@ function WriteupPage({ activeSection, setActiveSection }) {
           <div className="writeup-content-inner">
             <ErrorBoundary>
               <Suspense fallback={<PageLoader />}>
-                <WriteupDetail />
+                {entry?.kind === 'event' ? <CtfEvent key={slug} event={entry} /> : <WriteupDetail />}
               </Suspense>
             </ErrorBoundary>
           </div>

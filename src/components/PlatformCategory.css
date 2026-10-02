@@ -124,6 +124,48 @@
   font-weight: 700;
 }
 
+.writeup-sort-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  position: relative;
+  z-index: 1;
+}
+
+.writeup-sort-controls label {
+  display: flex;
+  flex: 1 1 170px;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 260px;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.writeup-sort-controls select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(var(--cp-cyan-rgb), 0.4);
+  border-radius: 6px;
+  background: #050b18;
+  color: var(--cp-cyan);
+  font: inherit;
+  cursor: pointer;
+  color-scheme: dark;
+}
+
+.writeup-sort-controls select:focus-visible {
+  outline: 2px solid var(--cp-cyan);
+  outline-offset: 3px;
+}
+
+.writeup-sort-controls select:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* ================================================================
    TERMINAL DOSSIER ROWS
    ================================================================ */

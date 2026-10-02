@@ -4,7 +4,9 @@ import { Lock } from 'lucide-react';
 import writeupsData from '../data/writeupsData.json';
 import WriteupDrawer from './WriteupDrawer';
 import SearchBar from './SearchBar';
+import { sortWriteups } from '../algorithms/sortWriteups';
 import './PlatformCategory.css';
+import ReportBadges, { isBountyReport } from './ReportBadges';
 
 function osTagFor(os) {
   const normalized = (os || '').toLowerCase();
@@ -29,14 +31,21 @@ function PlatformCategory() {
   const { platform } = useParams();
   const normalizedPlatform = normalizeLabel(platform);
   const platformDef = PLATFORM_DEFINITIONS[normalizedPlatform];
+  const [sortBy, setSortBy] = useState('added');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   const items = useMemo(() => {
     const allItems = writeupsData.items ?? [];
     return allItems.filter((writeup) => {
       const writeupPlatform = normalizeLabel(writeup.platform || '');
-      return writeupPlatform === normalizedPlatform;
+      return writeupPlatform === normalizedPlatform && !writeup.eventSlug;
     });
   }, [normalizedPlatform]);
+
+  const sortedItems = useMemo(
+    () => sortWriteups(items, sortBy, sortDirection),
+    [items, sortBy, sortDirection]
+  );
 
   const [drawerOpen, setDrawerOpen] = useState(() => (
     typeof window === 'undefined' ? true : window.innerWidth > 1024
@@ -100,6 +109,39 @@ function PlatformCategory() {
 
           <SearchBar platformFilter={platformDef.label} />
 
+          <div className="writeup-sort-controls">
+            <label htmlFor="writeup-sort-by">
+              Sort by
+              <select
+                id="writeup-sort-by"
+                value={sortBy}
+                disabled={!items.length}
+                onChange={(event) => {
+                  const field = event.target.value;
+                  setSortBy(field);
+                  setSortDirection(field === 'name' || field === 'difficulty' ? 'asc' : 'desc');
+                }}
+              >
+                <option value="added">Recently added</option>
+                <option value="name">Name</option>
+                <option value="difficulty">{normalizedPlatform === 'bugbountyreports' ? 'Severity' : 'Difficulty'}</option>
+                <option value="date">Writeup date</option>
+              </select>
+            </label>
+            <label htmlFor="writeup-sort-direction">
+              Order
+              <select
+                id="writeup-sort-direction"
+                value={sortDirection}
+                disabled={!items.length}
+                onChange={(event) => setSortDirection(event.target.value)}
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </label>
+          </div>
+
           {items.length === 0 ? (
             <div className="writeups-placeholder">
               <div className="placeholder-art">
@@ -119,7 +161,7 @@ function PlatformCategory() {
               </div>
 
               <div className="writeup-row-list" role="list">
-                {items.map((writeup) => {
+                {sortedItems.map((writeup) => {
                   if (writeup.locked) {
                     return (
                       <Link
@@ -162,13 +204,15 @@ function PlatformCategory() {
                       <div className="row-main">
                         <div className="row-title-line">
                           <span className="row-title">{writeup.title}</span>
-                          <span className={`row-pill difficulty ${difficultyNormalized}`}>[{difficultyLabel}]</span>
-                          <span className="row-os">{osTag}</span>
+                          {writeup.kind === 'event' ? <span className="row-pill">EVENT LIBRARY</span> : isBountyReport(writeup) ? <ReportBadges writeup={writeup} /> : <>
+                            <span className={`row-pill difficulty ${difficultyNormalized}`}>[{difficultyLabel}]</span>
+                            <span className="row-os">{osTag}</span>
+                          </>}
                           <span className="row-date">{writeup.displayDate}</span>
                         </div>
                         <div className="row-meta-line">
                           <span className="row-tags">{tagsLine}</span>
-                          <span className="row-readtime">{writeup.readTime}</span>
+                          <span className="row-readtime">{writeup.kind === 'event' ? `${writeupsData.items.filter(item => item.eventSlug === writeup.slug).length} challenges` : writeup.readTime}</span>
                         </div>
                       </div>
                     </Link>
